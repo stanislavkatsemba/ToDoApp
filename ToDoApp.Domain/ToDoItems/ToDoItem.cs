@@ -26,6 +26,8 @@ namespace ToDoApp.Domain.ToDoItems
 
         public bool IsCompleted => _isCompleted;
 
+        public bool IsOwnedBy(UserId userId) => _userId.Equals(userId);
+
         public static ToDoItem New(UserId userId, string name, string description, DateTime? scheduledDate = null) =>
             new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate, isCompleted: false, completionData: null, creationDate: DateTime.Now, lastEditionDate: null);
 
