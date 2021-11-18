@@ -16,6 +16,10 @@ namespace ToDoApp.Domain.ToDoItems
 
         private DateTime? _scheduledDate;
 
+        private DateTime? _creationDate;
+
+        private DateTime? _lastEditionDate;
+
         private bool _isCompleted;
 
         private DateTime? _completionData;
@@ -23,9 +27,10 @@ namespace ToDoApp.Domain.ToDoItems
         public bool IsCompleted => _isCompleted;
 
         public static ToDoItem New(UserId userId, string name, string description, DateTime? scheduledDate = null) =>
-            new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate, isCompleted: false, completionData: null);
+            new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate, isCompleted: false, completionData: null, creationDate: DateTime.Now, lastEditionDate: null);
 
-        private ToDoItem(ToDoItemId id, UserId userId, string name, string description, DateTime? scheduledDate, bool isCompleted, DateTime? completionData)
+        private ToDoItem(ToDoItemId id, UserId userId, string name, string description, DateTime? scheduledDate,
+            bool isCompleted, DateTime? completionData, DateTime? creationDate, DateTime? lastEditionDate)
         {
             Id = id;
             _userId = userId;
@@ -34,31 +39,74 @@ namespace ToDoApp.Domain.ToDoItems
             _scheduledDate = scheduledDate;
             _isCompleted = isCompleted;
             _completionData = completionData;
+            _creationDate = creationDate;
+            _lastEditionDate = lastEditionDate;
         }
 
         public Result Update(string name, string description)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return Result.Failure("Der Aufgabenname darf nicht leer sein.");
+            }
+
+            if (_name.Equals(name) && _description.Equals(description))
+            {
+                return Result.Success();
+            }
+
+            _name = name;
+            _description = description;
+            UpdateLastEditionDate();
+            return Result.Success();
         }
 
         public Result Complete()
         {
-            throw new NotImplementedException();
+            if (_isCompleted)
+            {
+                return Result.Success();
+            }
+
+            _isCompleted = true;
+            _completionData = DateTime.Now;
+            return Result.Success();
         }
 
         public Result RevokeCompletion()
         {
-            throw new NotImplementedException();
+            if (_isCompleted == false)
+            {
+                return Result.Success();
+            }
+
+            _isCompleted = false;
+            _completionData = null;
+            return Result.Success();
         }
 
         public Result Schedule(DateTime dateTime)
         {
-            throw new NotImplementedException();
+            if (dateTime < DateTime.Today)
+            {
+                return Result.Failure("Man kann eine Aufgabe nicht für die Vergangenheit planen.");
+            }
+
+            _scheduledDate = dateTime;
+            UpdateLastEditionDate();
+            return Result.Success();
         }
 
         public Result ClearScheduling()
         {
-            throw new NotImplementedException();
+            _scheduledDate = null;
+            UpdateLastEditionDate();
+            return Result.Success();
+        }
+
+        private void UpdateLastEditionDate()
+        {
+            _lastEditionDate = DateTime.Now;
         }
     }
 }
