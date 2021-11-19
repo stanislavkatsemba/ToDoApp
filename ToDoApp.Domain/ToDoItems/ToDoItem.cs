@@ -16,7 +16,7 @@ namespace ToDoApp.Domain.ToDoItems
 
         private DateTime? _scheduledDate;
 
-        private DateTime? _creationDate;
+        private readonly DateTime _creationDate;
 
         private DateTime? _lastEditionDate;
 
@@ -32,7 +32,7 @@ namespace ToDoApp.Domain.ToDoItems
             new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate, isCompleted: false, completionData: null, creationDate: DateTime.Now, lastEditionDate: null);
 
         private ToDoItem(ToDoItemId id, UserId userId, string name, string description, DateTime? scheduledDate,
-            bool isCompleted, DateTime? completionData, DateTime? creationDate, DateTime? lastEditionDate)
+            bool isCompleted, DateTime? completionData, DateTime creationDate, DateTime? lastEditionDate)
         {
             Id = id;
             _userId = userId;
@@ -109,6 +109,33 @@ namespace ToDoApp.Domain.ToDoItems
         private void UpdateLastEditionDate()
         {
             _lastEditionDate = DateTime.Now;
+        }
+
+        public static ToDoItem FromSnapshot(ToDoItemSnapshot snapshot)
+        {
+            return new ToDoItem(new ToDoItemId(new Guid(snapshot.Id)),
+                new UserId(new Guid(snapshot.UserId)),
+                snapshot.Name,
+                snapshot.Description,
+                snapshot.ScheduledDate,
+                snapshot.IsCompleted,
+                snapshot.CompletionData,
+                snapshot.CreationDate,
+                snapshot.LastEditionDate
+                );
+        }
+
+        public ToDoItemSnapshot ToSnapshot()
+        {
+            return new ToDoItemSnapshot(Id.Value.ToString(),
+                   _userId.Value.ToString(),
+                   _name,
+                   _description,
+                   _scheduledDate,
+                   _creationDate,
+                   _lastEditionDate,
+                   _isCompleted,
+                   _completionData);
         }
     }
 }

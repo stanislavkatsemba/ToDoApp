@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ToDoApp.Domain.Shared;
 using ToDoApp.Domain.Users;
 
@@ -60,7 +59,5 @@ namespace ToDoApp.Domain.ToDoItems
 
             return Result.Success();
         }
-
-
     }
 }
