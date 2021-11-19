@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ToDoApp.Data;
+using ToDoApp.Data.Repositories;
+using ToDoApp.Domain.ToDoItems;
+using ToDoApp.Domain.Users;
 
 namespace ToDoApp.Web
 {
@@ -27,6 +31,17 @@ namespace ToDoApp.Web
             {
                 configuration.RootPath = "ClientApp/build";
             });
+
+            //Database
+            services.AddDbContext<ToDoAppContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            });
+
+            //Repositories
+            services.AddScoped<IToDoItemRepository, ToDoItemSqlRepository>();
+            services.AddScoped<IUserRepository, UserSqlRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
