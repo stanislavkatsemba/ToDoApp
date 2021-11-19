@@ -24,6 +24,7 @@ namespace ToDoApp.Data
                 optionsBuilder.UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=ToDoApp;Integrated Security=True");
             }
 #endif
+            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         }
 
         public DbSet<UserSnapshot> Users { get; set; }
