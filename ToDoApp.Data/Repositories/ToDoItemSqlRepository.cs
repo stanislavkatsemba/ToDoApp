@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using ToDoApp.Data.Exceptions;
 using ToDoApp.Domain.ToDoItems;
 
 namespace ToDoApp.Data.Repositories
@@ -20,14 +21,23 @@ namespace ToDoApp.Data.Repositories
 
         public async Task<ToDoItem> FindBy(ToDoItemId id)
         {
-            var snapshot= await _databaseContext.ToDoItems.FindAsync(id.Value);
+            var snapshot= await _databaseContext.ToDoItems.FindAsync(id.Value.ToString());
             return snapshot != null ? ToDoItem.FromSnapshot(snapshot) : null;
         }
 
         public async Task Update(ToDoItem toDoItem)
         {
-            _databaseContext.ToDoItems.Update(toDoItem.ToSnapshot());
-            await _databaseContext.SaveChangesAsync();
+            var snapshot = toDoItem.ToSnapshot();
+            var dbItem = await _databaseContext.ToDoItems.FindAsync(snapshot.Id);
+            if (dbItem != null)
+            {
+                _databaseContext.Entry(dbItem).CurrentValues.SetValues(snapshot);
+                await _databaseContext.SaveChangesAsync();
+            }
+            else
+            {
+                throw new EntityNotFoundException(nameof(ToDoItemId), snapshot.Id);
+            }
         }
     }
 }
