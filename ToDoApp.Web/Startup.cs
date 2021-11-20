@@ -9,6 +9,7 @@ using ToDoApp.Data;
 using ToDoApp.Data.Repositories;
 using ToDoApp.Domain.ToDoItems;
 using ToDoApp.Domain.Users;
+using ToDoApp.Web.Common.Authentication;
 
 namespace ToDoApp.Web
 {
@@ -42,6 +43,13 @@ namespace ToDoApp.Web
             //Repositories
             services.AddScoped<IToDoItemRepository, ToDoItemSqlRepository>();
             services.AddScoped<IUserRepository, UserSqlRepository>();
+
+            //Jwt service
+            services.AddScoped<JwtService>();
+
+            //Application services
+            services.AddScoped<UserService>();
+            services.AddScoped<ToDoItemService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
