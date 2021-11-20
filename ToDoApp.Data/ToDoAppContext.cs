@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ToDoApp.Domain.ToDoItems;
-using ToDoApp.Domain.Users;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using ToDoApp.Data.Interfaces;
+using ToDoApp.Data.Models;
 
 namespace ToDoApp.Data
 {
@@ -27,16 +30,67 @@ namespace ToDoApp.Data
             optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         }
 
-        public DbSet<UserSnapshot> Users { get; set; }
+        public DbSet<UserModel> Users { get; set; }
 
-        public DbSet<ToDoItemSnapshot> ToDoItems { get; set; }
+        public DbSet<ToDoItemModel> ToDoItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserSnapshot>(entity =>
+            modelBuilder.Entity<UserModel>(entity =>
             {
                 entity.HasIndex(x => x.Name).IsUnique();
             });
+
+            modelBuilder.Entity<ToDoItemModel>(entity =>
+            {
+                entity.HasQueryFilter(x => x.IsDeleted == false);
+                entity.HasOne<UserModel>()
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .IsRequired();
+            });
+        }
+
+        public override int SaveChanges()
+        {
+            UpdateAdditionalData();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            UpdateAdditionalData();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void UpdateAdditionalData()
+        {
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        if (entry.Entity is IEntityHasCreationInfo entityHasCreationInfo)
+                        {
+                            entityHasCreationInfo.CreationDate = DateTime.Now;
+                        }
+                        break;
+                    case EntityState.Modified:
+                        if (entry.Entity is IEntityHasModificationInfo entityHasModificationInfo)
+                        {
+                            entityHasModificationInfo.ModificationDate = DateTime.Now;
+                        }
+                        break;
+                    case EntityState.Deleted:
+                        if (entry.Entity is IEntitySoftDeletion entitySoftDeletion)
+                        {
+                            entry.State = EntityState.Modified;
+                            entitySoftDeletion.IsDeleted = true;
+                            entitySoftDeletion.DeletionDateTime = DateTime.Now;
+                        }
+                        break;
+                }
+            }
         }
     }
 }

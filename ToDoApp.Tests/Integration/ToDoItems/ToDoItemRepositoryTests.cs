@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using ToDoApp.Domain.ToDoItems;
+using ToDoApp.Domain.Users;
 using ToDoApp.Web;
 using Xunit;
 using static ToDoApp.Tests.Fixtures.ToDoItemFixture;
@@ -14,34 +15,38 @@ namespace ToDoApp.Tests.Integration.ToDoItems
     public class ToDoItemRepositoryTests : IClassFixture<WebApplicationFactory<Startup>>, IDisposable
     {
         private readonly IServiceScope _scope;
-        private readonly IToDoItemRepository _repository;
+        private readonly IToDoItemRepository _toDoItemRepository;
+        private readonly IUserRepository _userRepository;
 
         public ToDoItemRepositoryTests(WebApplicationFactory<Startup> appFactory)
         {
             _scope = appFactory.Services.CreateScope();
-            _repository = _scope.ServiceProvider.GetService<IToDoItemRepository>();
+            _toDoItemRepository = _scope.ServiceProvider.GetService<IToDoItemRepository>();
+            _userRepository = _scope.ServiceProvider.GetService<IUserRepository>();
         }
 
         [Fact]
         public async Task CanSaveAToDoItem()
         {
             // given:
-            var userId = CreateAnyUser();
+            var user = CreateAnyUser();
             // and:
-            var toDoItem = CreateToDoItemOwnedBy(userId);
+            await _userRepository.CreateNew(user);
             // and:
-            await _repository.CreateNew(toDoItem);
+            var toDoItem = CreateToDoItemOwnedBy(user.Id);
+            // and:
+            await _toDoItemRepository.CreateNew(toDoItem);
             // and:
             toDoItem.Complete();
             // and:
-            await _repository.Update(toDoItem);
+            await _toDoItemRepository.Update(toDoItem);
             // and:
-            var toDoItemFromDb = await _repository.FindBy(toDoItem.Id);
+            var toDoItemFromDb = await _toDoItemRepository.FindBy(toDoItem.Id);
             // expect:
             toDoItemFromDb.Should().NotBeNull();
             // and:
             toDoItemFromDb.Id.Should().Be(toDoItem.Id);
-            toDoItemFromDb.IsOwnedBy(userId).Should().BeTrue();
+            toDoItemFromDb.IsOwnedBy(user.Id).Should().BeTrue();
             toDoItemFromDb.IsCompleted.Should().BeTrue();
         }
 

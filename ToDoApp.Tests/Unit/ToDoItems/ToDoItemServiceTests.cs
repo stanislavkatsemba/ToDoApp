@@ -9,7 +9,7 @@ namespace ToDoApp.Tests.Unit.ToDoItems
 {
     public class ToDoItemServiceTests
     {
-        private readonly UserId _userId = UserFixture.CreateAnyUser();
+        private readonly UserId _userId = UserFixture.CreateAnyUserId();
         private readonly ToDoItemService _toDoItemService;
 
         public ToDoItemServiceTests()
@@ -51,7 +51,7 @@ namespace ToDoApp.Tests.Unit.ToDoItems
             // and:
             await _toDoItemService.Create(toDoItem);
             // when:
-            var result = await _toDoItemService.Complete(UserFixture.CreateAnyUser(), toDoItem.Id);
+            var result = await _toDoItemService.Complete(UserFixture.CreateAnyUserId(), toDoItem.Id);
             // then:
             result.IsFailure.Should().BeTrue();
         }

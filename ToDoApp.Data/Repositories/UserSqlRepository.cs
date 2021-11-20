@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using ToDoApp.Data.Models;
 using ToDoApp.Domain.Users;
 
 namespace ToDoApp.Data.Repositories
@@ -14,7 +15,7 @@ namespace ToDoApp.Data.Repositories
 
         public async Task CreateNew(User user)
         {
-            await _databaseContext.Users.AddAsync(user.ToSnapshot());
+            await _databaseContext.Users.AddAsync(new UserModel(user.ToSnapshot()));
             await _databaseContext.SaveChangesAsync();
         }
 

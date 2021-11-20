@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using ToDoApp.Data.Exceptions;
+using ToDoApp.Data.Models;
 using ToDoApp.Domain.ToDoItems;
 
 namespace ToDoApp.Data.Repositories
@@ -15,13 +16,13 @@ namespace ToDoApp.Data.Repositories
 
         public async Task CreateNew(ToDoItem toDoItem)
         {
-            await _databaseContext.ToDoItems.AddAsync(toDoItem.ToSnapshot());
+            await _databaseContext.ToDoItems.AddAsync(new ToDoItemModel(toDoItem.ToSnapshot()));
             await _databaseContext.SaveChangesAsync();
         }
 
         public async Task<ToDoItem> FindBy(ToDoItemId id)
         {
-            var snapshot= await _databaseContext.ToDoItems.FindAsync(id.Value.ToString());
+            var snapshot = await _databaseContext.ToDoItems.FindAsync(id.Value.ToString());
             return snapshot != null ? ToDoItem.FromSnapshot(snapshot) : null;
         }
 
