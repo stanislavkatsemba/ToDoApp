@@ -20,7 +20,7 @@ namespace ToDoApp.Data.Repositories
             await _databaseContext.SaveChangesAsync();
         }
 
-        public async Task<ToDoItem> FindBy(ToDoItemId id)
+        public async Task<ToDoItem> FindById(ToDoItemId id)
         {
             var snapshot = await _databaseContext.ToDoItems.FindAsync(id.Value.ToString());
             return snapshot != null ? ToDoItem.FromSnapshot(snapshot) : null;

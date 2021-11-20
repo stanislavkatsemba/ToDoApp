@@ -41,7 +41,7 @@ namespace ToDoApp.Tests.Integration.ToDoItems
             // and:
             await _toDoItemRepository.Update(toDoItem);
             // and:
-            var toDoItemFromDb = await _toDoItemRepository.FindBy(toDoItem.Id);
+            var toDoItemFromDb = await _toDoItemRepository.FindById(toDoItem.Id);
             // expect:
             toDoItemFromDb.Should().NotBeNull();
             // and:
