@@ -8,6 +8,6 @@ namespace ToDoApp.Domain.ToDoItems
 
         Task Update(ToDoItem toDoItem);
 
-        Task<ToDoItem> FindBy(ToDoItemId id);
+        Task<ToDoItem> FindById(ToDoItemId id);
     }
 }

@@ -19,7 +19,7 @@ namespace ToDoApp.Domain.ToDoItems
 
         public async Task<Result> Update(UserId userId, ToDoItemId toDoItemId, string name, string description)
         {
-            var toDoItem = await _repository.FindBy(toDoItemId);
+            var toDoItem = await _repository.FindById(toDoItemId);
             var checkResult = Check(userId, toDoItem, toDoItemId);
             if (checkResult.IsFailure)
             {
@@ -33,7 +33,7 @@ namespace ToDoApp.Domain.ToDoItems
 
         public async Task<Result> Complete(UserId userId, ToDoItemId toDoItemId)
         {
-            var toDoItem = await _repository.FindBy(toDoItemId);
+            var toDoItem = await _repository.FindById(toDoItemId);
             var checkResult = Check(userId, toDoItem, toDoItemId);
             if (checkResult.IsFailure)
             {

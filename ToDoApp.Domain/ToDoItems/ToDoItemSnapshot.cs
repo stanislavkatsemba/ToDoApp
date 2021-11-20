@@ -18,23 +18,17 @@ namespace ToDoApp.Domain.ToDoItems
 
         public DateTime? ScheduledDate { get; private set; }
 
-        public DateTime CreationDate { get; private set; }
-
-        public DateTime? LastEditionDate { get; private set; }
-
         public bool IsCompleted { get; private set; }
 
         public DateTime? CompletionData { get; private set; }
 
-        public ToDoItemSnapshot(string id, string userId, string name, string description, DateTime? scheduledDate, DateTime creationDate, DateTime? lastEditionDate, bool isCompleted, DateTime? completionData)
+        public ToDoItemSnapshot(string id, string userId, string name, string description, DateTime? scheduledDate, bool isCompleted, DateTime? completionData)
         {
             Id = id;
             UserId = userId;
             Name = name;
             Description = description;
             ScheduledDate = scheduledDate;
-            CreationDate = creationDate;
-            LastEditionDate = lastEditionDate;
             IsCompleted = isCompleted;
             CompletionData = completionData;
         }

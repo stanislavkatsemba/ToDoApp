@@ -6,6 +6,8 @@ namespace ToDoApp.Domain.Users
     {
         Task CreateNew(User user);
 
-        Task<User> FindBy(UserId id);
+        Task<User> FindById(UserId id);
+
+        Task<User> FindByName(string name);
     }
 }

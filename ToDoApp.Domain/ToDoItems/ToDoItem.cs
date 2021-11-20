@@ -16,10 +16,6 @@ namespace ToDoApp.Domain.ToDoItems
 
         private DateTime? _scheduledDate;
 
-        private readonly DateTime _creationDate;
-
-        private DateTime? _lastEditionDate;
-
         private bool _isCompleted;
 
         private DateTime? _completionData;
@@ -29,10 +25,10 @@ namespace ToDoApp.Domain.ToDoItems
         public bool IsOwnedBy(UserId userId) => _userId.Equals(userId);
 
         public static ToDoItem New(UserId userId, string name, string description, DateTime? scheduledDate = null) =>
-            new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate, isCompleted: false, completionData: null, creationDate: DateTime.Now, lastEditionDate: null);
+            new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate, isCompleted: false, completionData: null);
 
         private ToDoItem(ToDoItemId id, UserId userId, string name, string description, DateTime? scheduledDate,
-            bool isCompleted, DateTime? completionData, DateTime creationDate, DateTime? lastEditionDate)
+            bool isCompleted, DateTime? completionData)
         {
             Id = id;
             _userId = userId;
@@ -41,8 +37,6 @@ namespace ToDoApp.Domain.ToDoItems
             _scheduledDate = scheduledDate;
             _isCompleted = isCompleted;
             _completionData = completionData;
-            _creationDate = creationDate;
-            _lastEditionDate = lastEditionDate;
         }
 
         public Result Update(string name, string description)
@@ -59,7 +53,6 @@ namespace ToDoApp.Domain.ToDoItems
 
             _name = name;
             _description = description;
-            UpdateLastEditionDate();
             return Result.Success();
         }
 
@@ -95,20 +88,13 @@ namespace ToDoApp.Domain.ToDoItems
             }
 
             _scheduledDate = dateTime;
-            UpdateLastEditionDate();
             return Result.Success();
         }
 
         public Result ClearScheduling()
         {
             _scheduledDate = null;
-            UpdateLastEditionDate();
             return Result.Success();
-        }
-
-        private void UpdateLastEditionDate()
-        {
-            _lastEditionDate = DateTime.Now;
         }
 
         public static ToDoItem FromSnapshot(ToDoItemSnapshot snapshot)
@@ -119,9 +105,7 @@ namespace ToDoApp.Domain.ToDoItems
                 snapshot.Description,
                 snapshot.ScheduledDate,
                 snapshot.IsCompleted,
-                snapshot.CompletionData,
-                snapshot.CreationDate,
-                snapshot.LastEditionDate
+                snapshot.CompletionData
                 );
         }
 
@@ -132,8 +116,6 @@ namespace ToDoApp.Domain.ToDoItems
                    _name,
                    _description,
                    _scheduledDate,
-                   _creationDate,
-                   _lastEditionDate,
                    _isCompleted,
                    _completionData);
         }

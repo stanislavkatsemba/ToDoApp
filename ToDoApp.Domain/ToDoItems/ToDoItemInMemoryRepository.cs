@@ -16,7 +16,7 @@ namespace ToDoApp.Domain.ToDoItems
             return Task.CompletedTask;
         }
 
-        public Task<ToDoItem> FindBy(ToDoItemId id) => Task.FromResult(_totDoItems
+        public Task<ToDoItem> FindById(ToDoItemId id) => Task.FromResult(_totDoItems
             .Values.FirstOrDefault(toDoItem => toDoItem.Id.Equals(id)));
 
         public IEnumerable<ToDoItem> All() => _totDoItems.Values;

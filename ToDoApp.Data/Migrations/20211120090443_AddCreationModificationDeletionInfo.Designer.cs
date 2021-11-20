@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoApp.Data;
 
 namespace ToDoApp.Data.Migrations
 {
     [DbContext(typeof(ToDoAppContext))]
-    partial class ToDoAppContextModelSnapshot : ModelSnapshot
+    [Migration("20211120090443_AddCreationModificationDeletionInfo")]
+    partial class AddCreationModificationDeletionInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
