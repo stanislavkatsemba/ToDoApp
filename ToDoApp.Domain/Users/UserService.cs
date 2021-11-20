@@ -30,7 +30,7 @@ namespace ToDoApp.Domain.Users
             return Result.Success();
         }
 
-        public async Task<User> Authenticate(string userName)
+        public async Task<User> FindByName(string userName)
         {
             if (string.IsNullOrWhiteSpace(userName))
             {

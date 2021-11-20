@@ -34,7 +34,7 @@ namespace ToDoApp.Web.WebAPI.Authentication
                 return Result.Success();
             }
 
-            var result = await _userService.Authenticate(userName);
+            var result = await _userService.FindByName(userName);
             if (result == null)
             {
                 return Result.Failure("Falsches Benutzernamen oder Kennwort.");
