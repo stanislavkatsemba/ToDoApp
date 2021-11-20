@@ -46,7 +46,7 @@ namespace ToDoApp.Web.WebAPI.Authentication
             return Result.Success();
         }
 
-        [HttpPost("isAuthenticated")]
+        [HttpGet("isAuthenticated")]
         public Task<Result> IsAuthenticated()
         {
             if (User.Identity.IsAuthenticated)
