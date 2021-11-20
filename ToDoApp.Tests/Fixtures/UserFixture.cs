@@ -7,6 +7,6 @@ namespace ToDoApp.Tests.Fixtures
     {
         public static UserId CreateAnyUserId() => new UserId(Guid.NewGuid());
 
-        public static User CreateAnyUser() => new User(CreateAnyUserId(), "Test user");
+        public static User CreateAnyUser() => new User(CreateAnyUserId(), "Test user " + Guid.NewGuid());
     }
 }
