@@ -14,9 +14,22 @@ namespace ToDoApp.Web.Common.Authentication
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecureKey));
             var credentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature);
             var header = new JwtHeader(credentials);
-            var payload = new JwtPayload(issuer, audience:null, notBefore:null, claims:null, expires: DateTime.Now.AddDays(1));
+            var payload = new JwtPayload(issuer, audience: null, notBefore: null, claims: null, expires: DateTime.Now.AddDays(1));
             var securityToken = new JwtSecurityToken(header, payload);
             return new JwtSecurityTokenHandler().WriteToken(securityToken);
+        }
+
+        public JwtSecurityToken Verify(string jwt)
+        {
+            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecureKey));
+            new JwtSecurityTokenHandler().ValidateToken(jwt, new TokenValidationParameters
+            {
+                IssuerSigningKey = symmetricSecurityKey,
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+            }, out var securityToken);
+            return (JwtSecurityToken)securityToken;
         }
     }
 }

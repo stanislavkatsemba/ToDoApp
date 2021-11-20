@@ -26,10 +26,14 @@ namespace ToDoApp.Web.WebAPI.Authentication
             return await _userService.Register(userName);
         }
 
-
         [HttpPost("authentication")]
         public async Task<Result> Login([FromBody]string userName)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return Result.Success();
+            }
+
             var result = await _userService.Authenticate(userName);
             if (result == null)
             {
@@ -40,6 +44,16 @@ namespace ToDoApp.Web.WebAPI.Authentication
             Response.Cookies.Append("jwt", jwt, new CookieOptions { HttpOnly = true });
             
             return Result.Success();
+        }
+
+        [HttpPost("isAuthenticated")]
+        public Task<Result> IsAuthenticated()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return Task.FromResult(Result.Success());
+            }
+            return Task.FromResult(Result.Failure("Unauthenticated"));
         }
     }
 }

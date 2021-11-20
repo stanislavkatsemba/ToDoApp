@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -44,8 +45,10 @@ namespace ToDoApp.Web
             services.AddScoped<IToDoItemRepository, ToDoItemSqlRepository>();
             services.AddScoped<IUserRepository, UserSqlRepository>();
 
-            //Jwt service
+            //Authentication
             services.AddScoped<JwtService>();
+            services.AddAuthentication("Authentication")
+                .AddScheme<AuthenticationSchemeOptions, AuthenticationHandler>("Authentication", null);
 
             //Application services
             services.AddScoped<UserService>();
@@ -68,6 +71,9 @@ namespace ToDoApp.Web
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
