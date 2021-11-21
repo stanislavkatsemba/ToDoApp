@@ -26,9 +26,9 @@ export default function LoginForm() {
         setLoading(true);
 
         const result = await signIn(email, password);
-        if (!result.isOk) {
+        if (!result.isSuccessful) {
             setLoading(false);
-            notify(result.message, 'error', 2000);
+            notify(result.reason, 'error', 2000);
         }
     }, [signIn]);
 

@@ -11,7 +11,7 @@ import Form, {
 } from 'devextreme-react/form';
 import notify from 'devextreme/ui/notify';
 import LoadIndicator from 'devextreme-react/load-indicator';
-import { createAccount } from '../../api/auth';
+import apiClient from '../../api/apiClient';
 import './create-account-form.scss';
 
 export default function CreateAccountForm(props) {
@@ -24,13 +24,13 @@ export default function CreateAccountForm(props) {
         const { email, password } = formData.current;
         setLoading(true);
 
-        const result = await createAccount(email, password);
+        const result = await apiClient.register(email);
         setLoading(false);
 
-        if (result.isOk) {
+        if (result.isSuccessful) {
             history.push('/login');
         } else {
-            notify(result.message, 'error', 2000);
+            notify(result.reason, 'error', 2000);
         }
     }, [history]);
 

@@ -5,7 +5,8 @@ const prefix = "api";
 const apiClient = {
     authentication,
     register,
-    isAuthenticated,
+    getUser,
+    logout,
 }
 
 export default apiClient;
@@ -20,17 +21,22 @@ function register(userName: string): Promise<Result> {
     return post(url, userName);
 }
 
-function isAuthenticated(): Promise<Result> {
-    let url = `${prefix}/isAuthenticated`;
+function getUser(): Promise<Result> {
+    let url = `${prefix}/user`;
     return get(url);
 }
 
-function post(url: string, data: any): Promise<Result> {
-    let init: RequestInit = {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-    };
+function logout(): Promise<Result> {
+    let url = `${prefix}/logout`;
+    return post(url);
+}
+
+function post(url: string, data?: any): Promise<Result> {
+    let init: RequestInit = { method: "POST" };
+    if (data) {
+        init.body = JSON.stringify(data);
+        init.headers = { "Content-Type": "application/json" };
+    }
     return defaultFetch(url, init);
 }
 
@@ -46,6 +52,6 @@ function defaultFetch(url: string, init: RequestInit): Promise<Result> {
         }
         throw new Error(response.statusText);
     }).catch((error: Error) => {
-        return { IsSuccessful: false, Reason: error.message } as Result;
+        return { isSuccessful: false, reason: error.message } as Result;
     });
 }

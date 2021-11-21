@@ -46,14 +46,22 @@ namespace ToDoApp.Web.WebAPI.Authentication
             return Result.Success();
         }
 
-        [HttpGet("isAuthenticated")]
-        public Task<Result> IsAuthenticated()
+        [HttpGet("user")]
+        public async Task<UserInfo> IsAuthenticated()
         {
             if (User.Identity.IsAuthenticated)
             {
-                return Task.FromResult(Result.Success());
+                var user = await _userService.FindByName(User.Identity.Name);
+                return new UserInfo(user.Name);
             }
-            return Task.FromResult(Result.Failure("Unauthenticated"));
+            return null;
+        }
+
+        [HttpPost("logout")]
+        public Task<Result> Logout()
+        {
+            Response.Cookies.Delete("jwt");
+            return Task.FromResult(Result.Success());
         }
     }
 }

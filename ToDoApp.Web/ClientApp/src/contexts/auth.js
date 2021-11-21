@@ -1,38 +1,40 @@
 import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
-import { getUser, signIn as sendSignInRequest } from '../api/auth';
+import apiClient from '../api/apiClient';
 
 function AuthProvider(props) {
-  const [user, setUser] = useState();
-  const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState();
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async function () {
-      const result = await getUser();
-      if (result.isOk) {
-        setUser(result.data);
-      }
+    useEffect(() => {
+        (async function () {
+            const result = await apiClient.getUser();
+            if (result && result.userName) {
+                setUser({ email: result.userName });
+            }
+            setLoading(false);
+        })();
+    }, []);
 
-      setLoading(false);
-    })();
-  }, []);
+    const signIn = useCallback(async (email, password) => {
+        const result = await apiClient.authentication(email);
+        if (result.isSuccessful) {
+            setUser({ email: email });
+        }
 
-  const signIn = useCallback(async (email, password) => {
-    const result = await sendSignInRequest(email, password);
-    if (result.isOk) {
-      setUser(result.data);
-    }
+        return result;
+    }, []);
 
-    return result;
-  }, []);
-
-  const signOut = useCallback(() => {
-    setUser();
-  }, []);
+    const signOut = useCallback(async () => {
+        const result = await apiClient.logout();
+        if (result.isSuccessful) {
+            setUser();
+        }
+    }, []);
 
 
-  return (
-    <AuthContext.Provider value={{ user, signIn, signOut, loading }} {...props} />
-  );
+    return (
+        <AuthContext.Provider value={{ user, signIn, signOut, loading }} {...props} />
+    );
 }
 
 const AuthContext = createContext({});
