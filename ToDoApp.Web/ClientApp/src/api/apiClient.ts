@@ -1,4 +1,4 @@
-﻿import { Result } from "./apiInterfaces";
+import { Result } from "./apiInterfaces";
 
 const prefix = "api";
 

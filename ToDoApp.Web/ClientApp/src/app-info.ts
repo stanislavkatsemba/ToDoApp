@@ -1,5 +1,5 @@
 const appInfo = {
-    title: 'App Name'
+    title: 'ToDo-App'
 };
 export default appInfo;
 

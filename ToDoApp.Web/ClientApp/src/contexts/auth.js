@@ -37,7 +37,7 @@ function AuthProvider(props) {
     );
 }
 
-const AuthContext = createContext({});
+const AuthContext = createContext({ user: "", signIn: null, signOut: null, loading: true });
 const useAuth = () => useContext(AuthContext);
 
 export { AuthProvider, useAuth }

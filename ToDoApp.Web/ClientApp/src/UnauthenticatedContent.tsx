@@ -1,18 +1,18 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { SingleCard } from './layouts';
-import { LoginForm, ResetPasswordForm, ChangePasswordForm, CreateAccountForm } from './components';
+import { LoginForm, CreateAccountForm } from './components';
 
 export default function UnauthenticatedContent() {
     return (
         <Switch>
             <Route exact path='/login' >
-                <SingleCard title="Anmelden">
+                <SingleCard title="Anmelden" description="">
                     <LoginForm />
                 </SingleCard>
             </Route>
             <Route exact path='/create-account' >
-                <SingleCard title="Registrieren">
+                <SingleCard title="Registrieren" description="">
                     <CreateAccountForm />
                 </SingleCard>
             </Route>
