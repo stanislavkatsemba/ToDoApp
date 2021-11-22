@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ToDoApp.Data.Interfaces;
 using ToDoApp.Data.Models;
+using ToDoApp.Domain.ToDoItems.ReadModel;
 
 namespace ToDoApp.Data
 {
@@ -30,9 +31,19 @@ namespace ToDoApp.Data
             optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         }
 
+        #region Tables
+
         public DbSet<UserModel> Users { get; set; }
 
         public DbSet<ToDoItemModel> ToDoItems { get; set; }
+
+        #endregion
+
+        #region Views
+
+        public DbSet<ToDoItem> ToDoItemsRead { get; set; }
+
+        #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,8 +60,11 @@ namespace ToDoApp.Data
                     .HasForeignKey(x => x.UserId)
                     .IsRequired();
             });
+
+            modelBuilder.Entity<ToDoItem>().HasNoKey().ToView(null);
         }
 
+        #region Update additional data by saving
         public override int SaveChanges()
         {
             UpdateAdditionalData();
@@ -92,5 +106,7 @@ namespace ToDoApp.Data
                 }
             }
         }
+
+        #endregion
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using ToDoApp.Data;
 using ToDoApp.Data.Repositories;
 using ToDoApp.Domain.ToDoItems;
+using ToDoApp.Domain.ToDoItems.ReadModel;
 using ToDoApp.Domain.Users;
 using ToDoApp.Web.Common.Authentication;
 
@@ -43,6 +44,7 @@ namespace ToDoApp.Web
 
             //Repositories
             services.AddScoped<IToDoItemRepository, ToDoItemSqlRepository>();
+            services.AddScoped<IToDoItemReadRepository, ToDoItemReadSqlRepository>();
             services.AddScoped<IUserRepository, UserSqlRepository>();
 
             //Authentication
