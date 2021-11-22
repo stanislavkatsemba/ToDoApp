@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -9,6 +10,7 @@ using ToDoApp.Data;
 using ToDoApp.Data.Repositories;
 using ToDoApp.Domain.ToDoItems;
 using ToDoApp.Domain.Users;
+using ToDoApp.Web.Common.Authentication;
 
 namespace ToDoApp.Web
 {
@@ -42,6 +44,15 @@ namespace ToDoApp.Web
             //Repositories
             services.AddScoped<IToDoItemRepository, ToDoItemSqlRepository>();
             services.AddScoped<IUserRepository, UserSqlRepository>();
+
+            //Authentication
+            services.AddScoped<JwtService>();
+            services.AddAuthentication("Authentication")
+                .AddScheme<AuthenticationSchemeOptions, AuthenticationHandler>("Authentication", null);
+
+            //Application services
+            services.AddScoped<UserService>();
+            services.AddScoped<ToDoItemService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +71,9 @@ namespace ToDoApp.Web
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
