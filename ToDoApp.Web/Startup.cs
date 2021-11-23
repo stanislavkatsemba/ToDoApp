@@ -12,6 +12,7 @@ using ToDoApp.Domain.ToDoItems;
 using ToDoApp.Domain.ToDoItems.ReadModel;
 using ToDoApp.Domain.Users;
 using ToDoApp.Web.Common.Authentication;
+using ToDoApp.Web.Hubs.ToDoItems;
 
 namespace ToDoApp.Web
 {
@@ -55,6 +56,9 @@ namespace ToDoApp.Web
             //Application services
             services.AddScoped<UserService>();
             services.AddScoped<ToDoItemService>();
+
+            //SignalR
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -82,6 +86,11 @@ namespace ToDoApp.Web
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ToDoItemHub>("/hubs/toDoItems");
             });
 
             app.UseSpa(spa =>
