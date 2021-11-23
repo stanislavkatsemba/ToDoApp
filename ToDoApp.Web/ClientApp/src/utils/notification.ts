@@ -1,4 +1,4 @@
-﻿import { default as dxNotify }  from 'devextreme/ui/notify';
+import { default as dxNotify }  from 'devextreme/ui/notify';
 
 const notification = {
     notify,
