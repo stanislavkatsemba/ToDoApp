@@ -55,6 +55,8 @@ namespace ToDoApp.Data.Repositories
 FROM 
     {nameof(ToDoAppContext.ToDoItems)}
 WHERE
+    {nameof(ToDoItemModel.IsDeleted)} = 0
+AND
 ";
                 return _selectCommand;
             }

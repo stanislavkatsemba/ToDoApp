@@ -31,7 +31,7 @@ export default class Home extends React.Component<{}, IHomeState> {
             .withAutomaticReconnect()
             .build();
 
-        const store = new CustomStore<ToDoItem>({
+        const store = new CustomStore<ToDoItem, string>({
             load: () => this.hubConnection.invoke('GetAllToDoItems'),
             insert: (newItem) => {
                 const item: ToDoItemCreateInfo = {
@@ -42,7 +42,13 @@ export default class Home extends React.Component<{}, IHomeState> {
                 this.hubConnection.send("CreateToDoItem", item).catch(_ => {
                     notification.error('Keine Verbindung zum Server.', 5000);
                 });
-                Promise.resolve({} as any);
+                return Promise.resolve({} as any);
+            },
+            remove: (itemId) => {
+                this.hubConnection.send("RemoveToDoItem", itemId).catch(_ => {
+                    notification.error('Keine Verbindung zum Server.', 5000);
+                });
+                return Promise.resolve();
             },
             key: nameof<ToDoItem>(x => x.id),
         });
@@ -53,7 +59,11 @@ export default class Home extends React.Component<{}, IHomeState> {
             .start()
             .then(() => {
                 this.hubConnection.on('ReceiveToDoItem', (data: ToDoItem) => {
-                    store.push([{ type: "remove", key: nameof<ToDoItem>(x => x.id) }, { type: "insert", data: data }]);
+                    store.push([{ type: "remove", key: data.id }, { type: "insert", data: data }]);
+                });
+                this.hubConnection.on('ToDoItemRemoved', (id: string) => {
+                    debugger;
+                    store.push([{ type: "remove", key: id }]);
                 });
                 this.setState({ connectionStarted: true, dataSource: dataSource });
             });

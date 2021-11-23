@@ -15,6 +15,7 @@ namespace ToDoApp.Web.Hubs.ToDoItems
     public interface IChatClient
     {
         Task ReceiveToDoItem(ToDoItemRead message);
+        Task ToDoItemRemoved(string toDoItemId);
     }
 
     [Authorize]
@@ -33,11 +34,26 @@ namespace ToDoApp.Web.Hubs.ToDoItems
         {
             var userId = Context.User.GetUserId();
             var newToDoItem = ToDoItem.New(userId, createInfo.Name, createInfo.Description, createInfo.ScheduledDate);
-            await _toDoItemService.Create(newToDoItem);
+            var result = await _toDoItemService.Create(newToDoItem);
+            
+            //TODO: separate event
+            if (result.IsSuccessful)
+            {
+                var item = await _toDoItemReadSqlRepository.GetById(userId, newToDoItem.Id.Value);
+                await Clients.User(userId.Value.ToString()).ReceiveToDoItem(item);
+            }
+        }
 
-            var item = await _toDoItemReadSqlRepository.GetById(userId, newToDoItem.Id.Value);
+        public async Task RemoveToDoItem(string id)
+        {
+            var userId = Context.User.GetUserId();
+            var result = await _toDoItemService.Remove(userId, new ToDoItemId(new Guid(id)));
 
-            await Clients.User(userId.Value.ToString()).ReceiveToDoItem(item);
+            //TODO: separate event
+            if (result.IsSuccessful)
+            {
+                await Clients.User(userId.Value.ToString()).ToDoItemRemoved(id);
+            }
         }
 
         public async Task<IEnumerable<ToDoItemRead>> GetAllToDoItems()

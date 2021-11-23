@@ -17,6 +17,18 @@ namespace ToDoApp.Domain.ToDoItems
             return Result.Success();
         }
 
+        public async Task<Result> Remove(UserId userId, ToDoItemId toDoItemId)
+        {
+            var toDoItem = await _repository.FindById(toDoItemId);
+            var checkResult = Check(userId, toDoItem, toDoItemId);
+            if (checkResult.IsFailure)
+            {
+                return checkResult;
+            }
+            await _repository.Remove(toDoItem.Id);
+            return Result.Success();
+        }
+
         public async Task<Result> Update(UserId userId, ToDoItemId toDoItemId, string name, string description)
         {
             var toDoItem = await _repository.FindById(toDoItemId);

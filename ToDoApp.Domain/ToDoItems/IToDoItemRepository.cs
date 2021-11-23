@@ -9,5 +9,7 @@ namespace ToDoApp.Domain.ToDoItems
         Task Update(ToDoItem toDoItem);
 
         Task<ToDoItem> FindById(ToDoItemId id);
+
+        Task Remove(ToDoItemId id);
     }
 }
