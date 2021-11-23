@@ -1,11 +1,15 @@
 import React from 'react';
 import './home.scss';
 import { HubConnectionBuilder, HubConnection } from '@microsoft/signalr';
-import { Button } from 'devextreme-react/button';
-import DataGrid, { Pager, Paging } from 'devextreme-react/data-grid';
+import DataGrid, { Pager, Paging, Column, Editing, Form, FormItem } from 'devextreme-react/data-grid';
 import CustomStore from 'devextreme/data/custom_store';
 import DataSource from 'devextreme/data/data_source';
 import notification from '../../utils/notification';
+import { ToDoItemCreateInfo, ToDoItem } from '../../api/apiInterfaces';
+import nameof from 'ts-nameof.macro';
+import { CheckBox } from 'devextreme-react/check-box';
+import { RequiredRule, SimpleItem } from 'devextreme-react/form';
+import "devextreme/ui/text_area";
 
 interface IHomeState {
     connectionStarted: boolean,
@@ -27,9 +31,20 @@ export default class Home extends React.Component<{}, IHomeState> {
             .withAutomaticReconnect()
             .build();
 
-        const store = new CustomStore({
+        const store = new CustomStore<ToDoItem>({
             load: () => this.hubConnection.invoke('GetAllToDoItems'),
-            key: 'id',
+            insert: (newItem) => {
+                const item: ToDoItemCreateInfo = {
+                    name: newItem.name,
+                    description: newItem.description,
+                    scheduledDate: newItem.scheduledDate,
+                };
+                this.hubConnection.send("CreateToDoItem", item).catch(_ => {
+                    notification.error('Keine Verbindung zum Server.', 5000);
+                });
+                Promise.resolve({} as any);
+            },
+            key: nameof<ToDoItem>(x => x.id),
         });
 
         const dataSource = new DataSource({ store: store, reshapeOnPush: true });
@@ -37,8 +52,8 @@ export default class Home extends React.Component<{}, IHomeState> {
         this.hubConnection
             .start()
             .then(() => {
-                this.hubConnection.on('ReceiveToDoItem', (data) => {
-                    store.push([{ type: "remove", key: data.id }, { type: "insert", data: data }]);
+                this.hubConnection.on('ReceiveToDoItem', (data: ToDoItem) => {
+                    store.push([{ type: "remove", key: nameof<ToDoItem>(x => x.id) }, { type: "insert", data: data }]);
                 });
                 this.setState({ connectionStarted: true, dataSource: dataSource });
             });
@@ -48,17 +63,6 @@ export default class Home extends React.Component<{}, IHomeState> {
         this.hubConnection.stop();
     }
 
-    onClick = () => {
-        const item = {
-            name: "User",
-            description: "Test to do"
-        };
-
-        return this.hubConnection.send("CreateToDoItem", item).catch(_ => {
-            notification.error('Noch keine Verbindung zum Server.', 5000);
-        });
-    }
-
     render() {
 
         return (
@@ -66,9 +70,6 @@ export default class Home extends React.Component<{}, IHomeState> {
                 <h2 className={'content-block'}>Aufgaben</h2>
                 <div className={'content-block'}>
                     <div className={'dx-card responsive-paddings'}>
-                        <Button text="Create test ToDo" onClick={this.onClick} />
-                        <hr />
-
                         {this.state.connectionStarted
                             &&
                             <DataGrid
@@ -77,14 +78,72 @@ export default class Home extends React.Component<{}, IHomeState> {
                                 showBorders={false}
                                 columnAutoWidth={true}
                                 columnHidingEnabled={true}
+                                showColumnHeaders={false}
                             >
+                                <Editing
+                                    mode="form"
+                                    allowUpdating={true}
+                                    allowAdding={true}
+                                    allowDeleting={true}
+                                >
+                                    <Form
+                                        showValidationSummary={true}
+                                        colCount={1}
+                                    >
+                                        <SimpleItem
+                                            dataField={nameof<ToDoItem>(x => x.name)}
+                                            editorOptions={{ maxLength: 250 }}
+                                        >
+                                        </SimpleItem>
+                                        <SimpleItem
+                                            dataField={nameof<ToDoItem>(x => x.description)}
+                                        >
+                                        </SimpleItem>
+                                        <SimpleItem
+                                            dataField={nameof<ToDoItem>(x => x.scheduledDate)}
+                                        >
+                                        </SimpleItem>
+                                    </Form>
+                                </Editing>
                                 <Paging defaultPageSize={10} />
                                 <Pager showPageSizeSelector={true} showInfo={true} />
+                                <Column
+                                    dataField={nameof<ToDoItem>(x => x.id)}
+                                    cellRender={this.cellRender}
+                                />
+                                <Column
+                                    dataField={nameof<ToDoItem>(x => x.name)}
+                                    visible={false}
+                                    caption="Theme"
+                                >
+                                    <RequiredRule message="Thema ist erforderlich" />
+                                </Column>
+                                <Column
+                                    caption="Beschreibung"
+                                    dataField={nameof<ToDoItem>(x => x.description)}
+                                    visible={false}
+                                >
+                                    <FormItem editorType="dxTextArea" />
+                                </Column>
+                                <Column
+                                    caption="Planen"
+                                    dataField={nameof<ToDoItem>(x => x.scheduledDate)}
+                                    visible={false}
+                                />
                             </DataGrid>
                         }
-
                     </div>
                 </div>
+            </>
+        );
+    }
+
+    cellRender = (e: { data: ToDoItem }) => {
+        return (
+            <>
+                <CheckBox value={e.data.isCompleted} />&nbsp;&nbsp;&nbsp;
+                {e.data.name}
+                <div className="item-description">{e.data.description}</div>
             </>
         );
     }
