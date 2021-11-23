@@ -10,33 +10,37 @@ import { AuthProvider, useAuth } from './contexts/auth';
 import { useScreenSizeClass } from './utils/media-query';
 import Content from './Content';
 import UnauthenticatedContent from './UnauthenticatedContent';
+import deMessages from 'devextreme/localization/messages/de.json';
+import { locale, loadMessages } from 'devextreme/localization';
 
 function App() {
-  const { user, loading } = useAuth();
+    const { user, loading } = useAuth();
 
-  if (loading) {
-    return <LoadPanel visible={true} />;
-  }
+    if (loading) {
+        return <LoadPanel visible={true} />;
+    }
 
-  if (user) {
-    return <Content />;
-  }
+    if (user) {
+        return <Content />;
+    }
 
-  return <UnauthenticatedContent />;
+    return <UnauthenticatedContent />;
 }
 
 export default function Root() {
-  const screenSizeClass = useScreenSizeClass();
+    const screenSizeClass = useScreenSizeClass();
+    loadMessages(deMessages);
+    locale("de-DE");
 
-  return (
-    <Router>
-      <AuthProvider>
-        <NavigationProvider>
-          <div className={`app ${screenSizeClass}`}>
-            <App />
-          </div>
-        </NavigationProvider>
-      </AuthProvider>
-    </Router>
-  );
+    return (
+        <Router>
+            <AuthProvider>
+                <NavigationProvider>
+                    <div className={`app ${screenSizeClass}`}>
+                        <App />
+                    </div>
+                </NavigationProvider>
+            </AuthProvider>
+        </Router>
+    );
 }
