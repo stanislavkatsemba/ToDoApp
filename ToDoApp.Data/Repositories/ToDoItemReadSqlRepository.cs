@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ToDoApp.Data.Models;
 using ToDoApp.Domain.ToDoItems.ReadModel;
+using ToDoApp.Domain.Users;
 
 namespace ToDoApp.Data.Repositories
 {
@@ -16,19 +17,19 @@ namespace ToDoApp.Data.Repositories
             _databaseContext = databaseContext;
         }
 
-        public async Task<ToDoItem> GetById(Guid userId, Guid todItemId)
+        public async Task<ToDoItem> GetById(UserId userId, Guid todItemId)
         {
             var command = SelectCommand +
                 $"{nameof(ToDoItemModel.Id)} = {{0}} AND {nameof(ToDoItemModel.UserId)} = {{1}}";
-            var result = await _databaseContext.ToDoItemsRead.FromSqlRaw(command, todItemId, userId).FirstOrDefaultAsync();
+            var result = await _databaseContext.ToDoItemsRead.FromSqlRaw(command, todItemId, userId.Value).FirstOrDefaultAsync();
             return result;
         }
 
-        public async Task<IEnumerable<ToDoItem>> GetAllForUser(Guid userId)
+        public async Task<IEnumerable<ToDoItem>> GetAllForUser(UserId userId)
         {
             var command = SelectCommand +
                           $"{nameof(ToDoItemModel.UserId)} = {{0}}";
-            var result = await _databaseContext.ToDoItemsRead.FromSqlRaw(command, userId).ToListAsync();
+            var result = await _databaseContext.ToDoItemsRead.FromSqlRaw(command, userId.Value).ToListAsync();
             return result;
         }
 

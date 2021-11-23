@@ -45,11 +45,11 @@ namespace ToDoApp.Tests.Integration.ToDoItems
             // and:
             await _toDoItemRepository.Update(toDoItem);
             // and:
-            var toDoItemFromDb = await _toDoItemReadRepository.GetById(user.Id.Value, toDoItem.Id.Value);
+            var toDoItemFromDb = await _toDoItemReadRepository.GetById(user.Id, toDoItem.Id.Value);
             // expect:
             toDoItemFromDb.Should().NotBeNull();
             // and:
-            var toDoItemsFromDb = await _toDoItemReadRepository.GetAllForUser(user.Id.Value);
+            var toDoItemsFromDb = await _toDoItemReadRepository.GetAllForUser(user.Id);
             // expect:
             toDoItemsFromDb.Count().Should().BeGreaterThan(0);
         }
