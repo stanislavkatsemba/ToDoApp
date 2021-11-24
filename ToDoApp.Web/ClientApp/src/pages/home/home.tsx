@@ -7,7 +7,6 @@ import DataSource from 'devextreme/data/data_source';
 import notification from '../../utils/notification';
 import { ToDoItem, ToDoItemDto } from '../../api/apiInterfaces';
 import nameof from 'ts-nameof.macro';
-import { CheckBox } from 'devextreme-react/check-box';
 import { RequiredRule, SimpleItem } from 'devextreme-react/form';
 import "devextreme/ui/text_area";
 import { EventInfo } from 'devextreme/events';
@@ -108,6 +107,7 @@ export default class Home extends React.Component<{}, IHomeState> {
                                     allowUpdating={true}
                                     allowAdding={true}
                                     allowDeleting={true}
+                                    useIcons={true}
                                 >
                                     <Form
                                         showValidationSummary={true}
@@ -143,12 +143,28 @@ export default class Home extends React.Component<{}, IHomeState> {
                                     caption="Planen"
                                     dataField={nameof<ToDoItem>(x => x.scheduledDate)}
                                     visible={false}
+                                    sortIndex={2}
                                 />
                                 <Column
-                                    caption="Planen"
+                                    caption="Erstellungsdatum"
                                     dataField={nameof<ToDoItem>(x => x.creationDate)}
                                     visible={false}
-                                    sortOrder="desc"
+                                    sortOrder="asc"
+                                    sortIndex={3}
+                                />
+                                <Column
+                                    caption="Erledigungsdatum"
+                                    dataField={nameof<ToDoItem>(x => x.completionData)}
+                                    visible={false}
+                                    sortOrder="asc"
+                                    sortIndex={1}
+                                />
+                                <Column
+                                    caption="Erledigt"
+                                    dataField={nameof<ToDoItem>(x => x.isCompleted)}
+                                    visible={false}
+                                    sortOrder="asc"
+                                    sortIndex={0}
                                 />
                             </DataGrid>
                         }
