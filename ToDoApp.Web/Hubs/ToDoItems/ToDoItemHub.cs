@@ -30,16 +30,58 @@ namespace ToDoApp.Web.Hubs.ToDoItems
             _toDoItemReadSqlRepository = serviceProvider.GetRequiredService<IToDoItemReadRepository>();
         }
 
-        public async Task CreateToDoItem(ToDoItemCreateInfo createInfo)
+        public async Task CreateToDoItem(ToDoItemDto toDoItemDto)
         {
             var userId = Context.User.GetUserId();
-            var newToDoItem = ToDoItem.New(userId, createInfo.Name, createInfo.Description, createInfo.ScheduledDate);
+            var newToDoItem = ToDoItem.New(userId, toDoItemDto.Name, toDoItemDto.Description);
             var result = await _toDoItemService.Create(newToDoItem);
             
             //TODO: separate event
             if (result.IsSuccessful)
             {
                 var item = await _toDoItemReadSqlRepository.GetById(userId, newToDoItem.Id.Value);
+                await Clients.User(userId.Value.ToString()).ReceiveToDoItem(item);
+            }
+        }
+
+        public async Task UpdateToDoItem(ToDoItemDto toDoItemDto)
+        {
+            var userId = Context.User.GetUserId();
+            var toDoItemId = new ToDoItemId(new Guid(toDoItemDto.Id));
+            var result = await _toDoItemService.Update(userId, toDoItemId, toDoItemDto.Name, toDoItemDto.Description);
+
+            //TODO: separate event
+            if (result.IsSuccessful)
+            {
+                var item = await _toDoItemReadSqlRepository.GetById(userId, toDoItemId.Value);
+                await Clients.User(userId.Value.ToString()).ReceiveToDoItem(item);
+            }
+        }
+
+        public async Task ScheduleDoItem(string id, DateTime date)
+        {
+            var userId = Context.User.GetUserId();
+            var toDoItemId = new ToDoItemId(new Guid(id));
+            var result = await _toDoItemService.Schedule(userId, toDoItemId, date);
+
+            //TODO: separate event
+            if (result.IsSuccessful)
+            {
+                var item = await _toDoItemReadSqlRepository.GetById(userId, toDoItemId.Value);
+                await Clients.User(userId.Value.ToString()).ReceiveToDoItem(item);
+            }
+        }
+
+        public async Task CompleteDoItem(string id)
+        {
+            var userId = Context.User.GetUserId();
+            var toDoItemId = new ToDoItemId(new Guid(id));
+            var result = await _toDoItemService.Complete(userId, toDoItemId);
+
+            //TODO: separate event
+            if (result.IsSuccessful)
+            {
+                var item = await _toDoItemReadSqlRepository.GetById(userId, toDoItemId.Value);
                 await Clients.User(userId.Value.ToString()).ReceiveToDoItem(item);
             }
         }

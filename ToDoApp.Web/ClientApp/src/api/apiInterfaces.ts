@@ -7,10 +7,10 @@ export interface UserInfo {
     userName: string,
 }
 
-export interface ToDoItemCreateInfo {
+export interface ToDoItemDto {
+    id?: string,
     name: string,
     description?: string,
-    scheduledDate?: Date,
 }
 
 export interface ToDoItem {

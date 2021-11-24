@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ToDoApp.Domain.Shared;
 using ToDoApp.Domain.Users;
 
@@ -31,19 +32,30 @@ namespace ToDoApp.Domain.ToDoItems
 
         public async Task<Result> Update(UserId userId, ToDoItemId toDoItemId, string name, string description)
         {
-            var toDoItem = await _repository.FindById(toDoItemId);
-            var checkResult = Check(userId, toDoItem, toDoItemId);
-            if (checkResult.IsFailure)
-            {
-                return checkResult;
-            }
-
-            var result = toDoItem.Update(name, description);
-            await _repository.Update(toDoItem);
-            return result;
+            return await ExecuteAction(userId, toDoItemId, toDoItem => toDoItem.Update(name, description));
         }
 
         public async Task<Result> Complete(UserId userId, ToDoItemId toDoItemId)
+        {
+            return await ExecuteAction(userId, toDoItemId, toDoItem => toDoItem.Complete());
+        }
+
+        public async Task<Result> RevokeCompletion(UserId userId, ToDoItemId toDoItemId)
+        {
+            return await ExecuteAction(userId, toDoItemId, toDoItem => toDoItem.RevokeCompletion());
+        }
+
+        public async Task<Result> Schedule(UserId userId, ToDoItemId toDoItemId, DateTime date)
+        {
+            return await ExecuteAction(userId, toDoItemId, toDoItem => toDoItem.Schedule(date));
+        }
+
+        public async Task<Result> ClearScheduling(UserId userId, ToDoItemId toDoItemId, DateTime date)
+        {
+            return await ExecuteAction(userId, toDoItemId, toDoItem => toDoItem.ClearScheduling());
+        }
+
+        private async Task<Result> ExecuteAction(UserId userId, ToDoItemId toDoItemId, Func<ToDoItem, Result> action)
         {
             var toDoItem = await _repository.FindById(toDoItemId);
             var checkResult = Check(userId, toDoItem, toDoItemId);
@@ -52,12 +64,16 @@ namespace ToDoApp.Domain.ToDoItems
                 return checkResult;
             }
 
-            var result = toDoItem.Complete();
-            await _repository.Update(toDoItem);
+            var result = action(toDoItem);
+            if (result.IsSuccessful)
+            {
+                await _repository.Update(toDoItem);
+            }
+
             return result;
         }
 
-        private Result Check(UserId userId, ToDoItem toDoItem, ToDoItemId toDoItemId)
+        private static Result Check(UserId userId, ToDoItem toDoItem, ToDoItemId toDoItemId)
         {
             if (toDoItem == null)
             {

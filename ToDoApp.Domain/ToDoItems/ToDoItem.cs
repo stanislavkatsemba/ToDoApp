@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using ToDoApp.Domain.Shared;
 using ToDoApp.Domain.Users;
 
@@ -24,12 +25,17 @@ namespace ToDoApp.Domain.ToDoItems
 
         public bool IsOwnedBy(UserId userId) => _userId.Equals(userId);
 
-        public static ToDoItem New(UserId userId, string name, string description, DateTime? scheduledDate = null) =>
-            new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate, isCompleted: false, completionData: null);
+        public static ToDoItem New(UserId userId, string name, string description) =>
+            new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate: null, isCompleted: false, completionData: null);
 
         private ToDoItem(ToDoItemId id, UserId userId, string name, string description, DateTime? scheduledDate,
             bool isCompleted, DateTime? completionData)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
             Id = id;
             _userId = userId;
             _name = name;
@@ -46,7 +52,7 @@ namespace ToDoApp.Domain.ToDoItems
                 return Result.Failure("Der Aufgabenname darf nicht leer sein.");
             }
 
-            if (_name.Equals(name) && _description.Equals(description))
+            if (_name == name && _description == description)
             {
                 return Result.Success();
             }

@@ -38,6 +38,7 @@ namespace ToDoApp.Data.Repositories
             var snapshot = toDoItem.ToSnapshot();
             var dbItem = await FindByIdPrivate(snapshot.Id);
             _databaseContext.Entry(dbItem).CurrentValues.SetValues(snapshot);
+            _databaseContext.Update(dbItem);
             await _databaseContext.SaveChangesAsync();
         }
 

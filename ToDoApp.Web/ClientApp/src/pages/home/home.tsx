@@ -5,11 +5,13 @@ import DataGrid, { Pager, Paging, Column, Editing, Form, FormItem } from 'devext
 import CustomStore from 'devextreme/data/custom_store';
 import DataSource from 'devextreme/data/data_source';
 import notification from '../../utils/notification';
-import { ToDoItemCreateInfo, ToDoItem } from '../../api/apiInterfaces';
+import { ToDoItem, ToDoItemDto } from '../../api/apiInterfaces';
 import nameof from 'ts-nameof.macro';
 import { CheckBox } from 'devextreme-react/check-box';
 import { RequiredRule, SimpleItem } from 'devextreme-react/form';
 import "devextreme/ui/text_area";
+import { EventInfo } from 'devextreme/events';
+import dxDataGrid, { RowUpdatingInfo } from 'devextreme/ui/data_grid';
 
 interface IHomeState {
     connectionStarted: boolean,
@@ -34,12 +36,22 @@ export default class Home extends React.Component<{}, IHomeState> {
         const store = new CustomStore<ToDoItem, string>({
             load: () => this.hubConnection.invoke('GetAllToDoItems'),
             insert: (newItem) => {
-                const item: ToDoItemCreateInfo = {
+                const item: ToDoItemDto = {
                     name: newItem.name,
                     description: newItem.description,
-                    scheduledDate: newItem.scheduledDate,
                 };
                 this.hubConnection.send("CreateToDoItem", item).catch(_ => {
+                    notification.error('Keine Verbindung zum Server.', 5000);
+                });
+                return Promise.resolve({} as any);
+            },
+            update: (itemId, newItem) => {
+                const item: ToDoItemDto = {
+                    id: itemId,
+                    name: newItem.name,
+                    description: newItem.description,
+                };
+                this.hubConnection.send("UpdateToDoItem", item).catch(_ => {
                     notification.error('Keine Verbindung zum Server.', 5000);
                 });
                 return Promise.resolve({} as any);
@@ -86,9 +98,10 @@ export default class Home extends React.Component<{}, IHomeState> {
                                 className={'dx-card wide-card'}
                                 dataSource={this.state.dataSource}
                                 showBorders={false}
-                                columnAutoWidth={true}
                                 columnHidingEnabled={true}
                                 showColumnHeaders={false}
+                                repaintChangesOnly={true}
+                                onRowUpdating={this.onRowUpdating}
                             >
                                 <Editing
                                     mode="form"
@@ -100,19 +113,8 @@ export default class Home extends React.Component<{}, IHomeState> {
                                         showValidationSummary={true}
                                         colCount={1}
                                     >
-                                        <SimpleItem
-                                            dataField={nameof<ToDoItem>(x => x.name)}
-                                            editorOptions={{ maxLength: 250 }}
-                                        >
-                                        </SimpleItem>
-                                        <SimpleItem
-                                            dataField={nameof<ToDoItem>(x => x.description)}
-                                        >
-                                        </SimpleItem>
-                                        <SimpleItem
-                                            dataField={nameof<ToDoItem>(x => x.scheduledDate)}
-                                        >
-                                        </SimpleItem>
+                                        <SimpleItem dataField={nameof<ToDoItem>(x => x.name)} />
+                                        <SimpleItem dataField={nameof<ToDoItem>(x => x.description)} />
                                     </Form>
                                 </Editing>
                                 <Paging defaultPageSize={10} />
@@ -127,18 +129,25 @@ export default class Home extends React.Component<{}, IHomeState> {
                                     caption="Theme"
                                 >
                                     <RequiredRule message="Thema ist erforderlich" />
+                                    <FormItem editorType="dxTextBox" editorOptions={nameEditorOptions} />
                                 </Column>
                                 <Column
                                     caption="Beschreibung"
                                     dataField={nameof<ToDoItem>(x => x.description)}
                                     visible={false}
                                 >
-                                    <FormItem editorType="dxTextArea" />
+                                    <FormItem editorType="dxTextArea" editorOptions={descriptionEditorOptions} />
                                 </Column>
                                 <Column
                                     caption="Planen"
                                     dataField={nameof<ToDoItem>(x => x.scheduledDate)}
                                     visible={false}
+                                />
+                                <Column
+                                    caption="Planen"
+                                    dataField={nameof<ToDoItem>(x => x.creationDate)}
+                                    visible={false}
+                                    sortOrder="desc"
                                 />
                             </DataGrid>
                         }
@@ -146,6 +155,15 @@ export default class Home extends React.Component<{}, IHomeState> {
                 </div>
             </>
         );
+    }
+
+    onRowUpdating = (e: EventInfo<dxDataGrid<ToDoItem, any>> & RowUpdatingInfo<ToDoItem, any>) => {
+        if (e.newData.name === undefined) {
+            e.newData.name = e.oldData.name;
+        }
+        if (e.newData.description === undefined) {
+            e.newData.description = e.oldData.description;
+        }
     }
 
     cellRender = (e: { data: ToDoItem }) => {
@@ -158,3 +176,6 @@ export default class Home extends React.Component<{}, IHomeState> {
         );
     }
 }
+
+const nameEditorOptions = { maxLength: 250 }
+const descriptionEditorOptions = { maxLength: 1000 }
