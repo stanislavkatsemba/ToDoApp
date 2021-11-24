@@ -1,7 +1,7 @@
 import React from 'react';
 import './home.scss';
 import { HubConnectionBuilder, HubConnection } from '@microsoft/signalr';
-import DataGrid, { Pager, Paging, Column, Editing, Form, FormItem } from 'devextreme-react/data-grid';
+import DataGrid, { Pager, Paging, Column, Editing, Form, FormItem, SearchPanel } from 'devextreme-react/data-grid';
 import CustomStore from 'devextreme/data/custom_store';
 import DataSource from 'devextreme/data/data_source';
 import notification from '../../utils/notification';
@@ -117,6 +117,7 @@ export default class Home extends React.Component<{}, IHomeState> {
                                         <SimpleItem dataField={nameof<ToDoItem>(x => x.description)} />
                                     </Form>
                                 </Editing>
+                                <SearchPanel visible={true} width={300} />
                                 <Paging defaultPageSize={10} />
                                 <Pager showPageSizeSelector={true} showInfo={true} />
                                 <Column
