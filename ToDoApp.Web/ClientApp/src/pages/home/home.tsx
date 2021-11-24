@@ -148,14 +148,13 @@ export default class Home extends React.Component<{}, IHomeState> {
                                     caption="Planen"
                                     dataField={nameof<ToDoItem>(x => x.scheduledDate)}
                                     visible={false}
-                                    sortIndex={2}
                                 />
                                 <Column
                                     caption="Erstellungsdatum"
                                     dataField={nameof<ToDoItem>(x => x.creationDate)}
                                     visible={false}
-                                    sortOrder="asc"
-                                    sortIndex={3}
+                                    sortOrder="desc"
+                                    sortIndex={0}
                                 />
                                  <Column
                                     caption="Änderungsdatum"
@@ -166,15 +165,11 @@ export default class Home extends React.Component<{}, IHomeState> {
                                     caption="Erledigungsdatum"
                                     dataField={nameof<ToDoItem>(x => x.completionData)}
                                     visible={false}
-                                    sortOrder="asc"
-                                    sortIndex={1}
                                 />
                                 <Column
                                     caption="Erledigt"
                                     dataField={nameof<ToDoItem>(x => x.isCompleted)}
                                     visible={false}
-                                    sortOrder="asc"
-                                    sortIndex={0}
                                 />
                             </DataGrid>
                         }
