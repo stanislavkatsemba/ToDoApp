@@ -12,6 +12,7 @@ import { RequiredRule, SimpleItem } from 'devextreme-react/form';
 import "devextreme/ui/text_area";
 import { EventInfo } from 'devextreme/events';
 import dxDataGrid, { RowUpdatingInfo } from 'devextreme/ui/data_grid';
+import { ToDoItemMain } from './ToDoItemMain';
 
 interface IHomeState {
     connectionStarted: boolean,
@@ -168,28 +169,25 @@ export default class Home extends React.Component<{}, IHomeState> {
     cellRender = (e: { data: ToDoItem }) => {
         return (
             <>
-                <CheckBox
-                    value={e.data.isCompleted}
-                    onValueChange={this.onCompletedValueChanged.bind(null, e.data)}
+                <ToDoItemMain
+                    item={e.data}
+                    onComplete={this.onComplete}
+                    onRevokeCompletion={this.onRevokeCompletion}
                 />
-                &nbsp;&nbsp;&nbsp;
-                {e.data.name}
-                <div className="item-description">{e.data.description}</div>
             </>
         );
     }
 
-    onCompletedValueChanged = (toDoItem: ToDoItem, value: any) => {
-        if (value === true) {
-            this.hubConnection.send("CompleteToDoItem", toDoItem.id).catch(_ => {
-                this.notificateNoConnectionToHub();
-            });
-        }
-        if (value === false) {
-            this.hubConnection.send("RevokeCompletionToDoItem", toDoItem.id).catch(_ => {
-                this.notificateNoConnectionToHub();
-            });
-        }
+    onComplete = (id: string) => {
+        this.hubConnection.send("CompleteToDoItem", id).catch(_ => {
+            this.notificateNoConnectionToHub();
+        });
+    }
+
+    onRevokeCompletion = (id: string) => {
+        this.hubConnection.send("RevokeCompletionToDoItem", id).catch(_ => {
+            this.notificateNoConnectionToHub();
+        });
     }
 
     notificateNoConnectionToHub() {
