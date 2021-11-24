@@ -200,6 +200,8 @@ export default class Home extends React.Component<{}, IHomeState> {
                     item={e.data}
                     onComplete={this.onComplete}
                     onRevokeCompletion={this.onRevokeCompletion}
+                    onSchedule={this.onSchedule}
+                    onClearScheduling={this.onClearScheduling}
                 />
             </>
         );
@@ -213,6 +215,18 @@ export default class Home extends React.Component<{}, IHomeState> {
 
     onRevokeCompletion = (id: string) => {
         this.hubConnection.send("RevokeCompletionToDoItem", id).catch(_ => {
+            this.notificateNoConnectionToHub();
+        });
+    }
+
+    onSchedule = (id: string, date: Date) => {
+        this.hubConnection.send("ScheduleToDoItem", id, date).catch(_ => {
+            this.notificateNoConnectionToHub();
+        });
+    }
+
+    onClearScheduling = (id: string) => {
+        this.hubConnection.send("ClearSchedulingToDoItem", id).catch(_ => {
             this.notificateNoConnectionToHub();
         });
     }

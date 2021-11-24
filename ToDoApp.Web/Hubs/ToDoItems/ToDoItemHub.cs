@@ -58,11 +58,25 @@ namespace ToDoApp.Web.Hubs.ToDoItems
             }
         }
 
-        public async Task ScheduleDoItem(string id, DateTime date)
+        public async Task ScheduleToDoItem(string id, DateTime date)
         {
             var userId = Context.User.GetUserId();
             var toDoItemId = new ToDoItemId(new Guid(id));
             var result = await _toDoItemService.Schedule(userId, toDoItemId, date);
+
+            //TODO: separate event
+            if (result.IsSuccessful)
+            {
+                var item = await _toDoItemReadSqlRepository.GetById(userId, toDoItemId.Value);
+                await Clients.User(userId.Value.ToString()).ReceiveToDoItem(item);
+            }
+        }
+
+        public async Task ClearSchedulingToDoItem(string id)
+        {
+            var userId = Context.User.GetUserId();
+            var toDoItemId = new ToDoItemId(new Guid(id));
+            var result = await _toDoItemService.ClearScheduling(userId, toDoItemId);
 
             //TODO: separate event
             if (result.IsSuccessful)

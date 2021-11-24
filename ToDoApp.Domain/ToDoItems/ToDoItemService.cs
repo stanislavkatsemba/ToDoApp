@@ -50,7 +50,7 @@ namespace ToDoApp.Domain.ToDoItems
             return await ExecuteAction(userId, toDoItemId, toDoItem => toDoItem.Schedule(date));
         }
 
-        public async Task<Result> ClearScheduling(UserId userId, ToDoItemId toDoItemId, DateTime date)
+        public async Task<Result> ClearScheduling(UserId userId, ToDoItemId toDoItemId)
         {
             return await ExecuteAction(userId, toDoItemId, toDoItem => toDoItem.ClearScheduling());
         }
