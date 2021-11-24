@@ -21,6 +21,7 @@ interface IHomeState {
 export default class Home extends React.Component<{}, IHomeState> {
 
     hubConnection: HubConnection = null as any;
+    store: CustomStore<ToDoItem, string> = null as any;
 
     constructor(props: {}) {
         super(props);
@@ -33,7 +34,7 @@ export default class Home extends React.Component<{}, IHomeState> {
             .withAutomaticReconnect()
             .build();
 
-        const store = new CustomStore<ToDoItem, string>({
+        this.store = new CustomStore<ToDoItem, string>({
             load: () => this.hubConnection.invoke('GetAllToDoItems'),
             insert: (newItem) => {
                 const item: ToDoItemDto = {
@@ -41,7 +42,7 @@ export default class Home extends React.Component<{}, IHomeState> {
                     description: newItem.description,
                 };
                 this.hubConnection.send("CreateToDoItem", item).catch(_ => {
-                    notification.error('Keine Verbindung zum Server.', 5000);
+                    this.notificateNoConnectionToHub();
                 });
                 return Promise.resolve({} as any);
             },
@@ -52,30 +53,29 @@ export default class Home extends React.Component<{}, IHomeState> {
                     description: newItem.description,
                 };
                 this.hubConnection.send("UpdateToDoItem", item).catch(_ => {
-                    notification.error('Keine Verbindung zum Server.', 5000);
+                    this.notificateNoConnectionToHub();
                 });
                 return Promise.resolve({} as any);
             },
             remove: (itemId) => {
                 this.hubConnection.send("RemoveToDoItem", itemId).catch(_ => {
-                    notification.error('Keine Verbindung zum Server.', 5000);
+                    this.notificateNoConnectionToHub();
                 });
                 return Promise.resolve();
             },
             key: nameof<ToDoItem>(x => x.id),
         });
 
-        const dataSource = new DataSource({ store: store, reshapeOnPush: true });
+        const dataSource = new DataSource({ store: this.store, reshapeOnPush: true });
 
         this.hubConnection
             .start()
             .then(() => {
                 this.hubConnection.on('ReceiveToDoItem', (data: ToDoItem) => {
-                    store.push([{ type: "remove", key: data.id }, { type: "insert", data: data }]);
+                    this.store.push([{ type: "remove", key: data.id }, { type: "insert", data: data }]);
                 });
                 this.hubConnection.on('ToDoItemRemoved', (id: string) => {
-                    debugger;
-                    store.push([{ type: "remove", key: id }]);
+                    this.store.push([{ type: "remove", key: id }]);
                 });
                 this.setState({ connectionStarted: true, dataSource: dataSource });
             });
@@ -100,7 +100,6 @@ export default class Home extends React.Component<{}, IHomeState> {
                                 showBorders={false}
                                 columnHidingEnabled={true}
                                 showColumnHeaders={false}
-                                repaintChangesOnly={true}
                                 onRowUpdating={this.onRowUpdating}
                             >
                                 <Editing
@@ -169,11 +168,32 @@ export default class Home extends React.Component<{}, IHomeState> {
     cellRender = (e: { data: ToDoItem }) => {
         return (
             <>
-                <CheckBox value={e.data.isCompleted} />&nbsp;&nbsp;&nbsp;
+                <CheckBox
+                    value={e.data.isCompleted}
+                    onValueChange={this.onCompletedValueChanged.bind(null, e.data)}
+                />
+                &nbsp;&nbsp;&nbsp;
                 {e.data.name}
                 <div className="item-description">{e.data.description}</div>
             </>
         );
+    }
+
+    onCompletedValueChanged = (toDoItem: ToDoItem, value: any) => {
+        if (value === true) {
+            this.hubConnection.send("CompleteToDoItem", toDoItem.id).catch(_ => {
+                this.notificateNoConnectionToHub();
+            });
+        }
+        if (value === false) {
+            this.hubConnection.send("RevokeCompletionToDoItem", toDoItem.id).catch(_ => {
+                this.notificateNoConnectionToHub();
+            });
+        }
+    }
+
+    notificateNoConnectionToHub() {
+        notification.error('Keine Verbindung zum Server.');
     }
 }
 

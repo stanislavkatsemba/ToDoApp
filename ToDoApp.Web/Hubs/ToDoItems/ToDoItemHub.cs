@@ -72,11 +72,25 @@ namespace ToDoApp.Web.Hubs.ToDoItems
             }
         }
 
-        public async Task CompleteDoItem(string id)
+        public async Task CompleteToDoItem(string id)
         {
             var userId = Context.User.GetUserId();
             var toDoItemId = new ToDoItemId(new Guid(id));
             var result = await _toDoItemService.Complete(userId, toDoItemId);
+
+            //TODO: separate event
+            if (result.IsSuccessful)
+            {
+                var item = await _toDoItemReadSqlRepository.GetById(userId, toDoItemId.Value);
+                await Clients.User(userId.Value.ToString()).ReceiveToDoItem(item);
+            }
+        }
+
+        public async Task RevokeCompletionToDoItem(string id)
+        {
+            var userId = Context.User.GetUserId();
+            var toDoItemId = new ToDoItemId(new Guid(id));
+            var result = await _toDoItemService.RevokeCompletion(userId, toDoItemId);
 
             //TODO: separate event
             if (result.IsSuccessful)
