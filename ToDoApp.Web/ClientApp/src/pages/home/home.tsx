@@ -1,7 +1,7 @@
 import React from 'react';
 import './home.scss';
 import { HubConnectionBuilder, HubConnection } from '@microsoft/signalr';
-import DataGrid, { Pager, Paging, Column, Editing, Form, FormItem, SearchPanel } from 'devextreme-react/data-grid';
+import DataGrid, { Pager, Paging, Column, Editing, Form, FormItem, SearchPanel, FilterPanel, Texts } from 'devextreme-react/data-grid';
 import CustomStore from 'devextreme/data/custom_store';
 import DataSource from 'devextreme/data/data_source';
 import notification from '../../utils/notification';
@@ -116,17 +116,22 @@ export default class Home extends React.Component<{}, IHomeState> {
                                         <SimpleItem dataField={nameof<ToDoItem>(x => x.name)} />
                                         <SimpleItem dataField={nameof<ToDoItem>(x => x.description)} />
                                     </Form>
+                                    <Texts 
+                                        confirmDeleteMessage="Sind Sie sicher, dass Sie diese Aufgabe löschen wollen?"
+                                    />
                                 </Editing>
                                 <SearchPanel visible={true} width={300} />
                                 <Paging defaultPageSize={10} />
                                 <Pager showPageSizeSelector={true} showInfo={true} />
+                                <FilterPanel visible={true} />
                                 <Column
                                     dataField={nameof<ToDoItem>(x => x.id)}
-                                    cellRender={this.cellRender}
+                                    visible={false}
+                                    allowFiltering={false}
                                 />
                                 <Column
                                     dataField={nameof<ToDoItem>(x => x.name)}
-                                    visible={false}
+                                    cellRender={this.cellRender}
                                     caption="Theme"
                                 >
                                     <RequiredRule message="Thema ist erforderlich" />
@@ -151,6 +156,11 @@ export default class Home extends React.Component<{}, IHomeState> {
                                     visible={false}
                                     sortOrder="asc"
                                     sortIndex={3}
+                                />
+                                 <Column
+                                    caption="Änderungsdatum"
+                                    dataField={nameof<ToDoItem>(x => x.modificationDate)}
+                                    visible={false}
                                 />
                                 <Column
                                     caption="Erledigungsdatum"
