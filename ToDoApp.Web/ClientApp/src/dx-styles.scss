@@ -84,3 +84,7 @@ html, body {
 .dx-theme-generic .dx-toolbar.dx-popup-bottom {
     padding: 20px 20px;
 }
+
+.dx-datagrid-content .dx-datagrid-table .dx-row > td, .dx-datagrid-content .dx-datagrid-table .dx-row > tr > td .dx-command-edit-with-icons {
+    vertical-align: middle;
+}

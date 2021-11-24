@@ -41,9 +41,7 @@ export default class Home extends React.Component<{}, IHomeState> {
                     name: newItem.name,
                     description: newItem.description,
                 };
-                this.hubConnection.send("CreateToDoItem", item).catch(_ => {
-                    this.notificateNoConnectionToHub();
-                });
+                this.sendMessageToHub("CreateToDoItem", item);
                 return Promise.resolve({} as any);
             },
             update: (itemId, newItem) => {
@@ -52,15 +50,11 @@ export default class Home extends React.Component<{}, IHomeState> {
                     name: newItem.name,
                     description: newItem.description,
                 };
-                this.hubConnection.send("UpdateToDoItem", item).catch(_ => {
-                    this.notificateNoConnectionToHub();
-                });
+                this.sendMessageToHub("UpdateToDoItem", item);
                 return Promise.resolve({} as any);
             },
             remove: (itemId) => {
-                this.hubConnection.send("RemoveToDoItem", itemId).catch(_ => {
-                    this.notificateNoConnectionToHub();
-                });
+                this.sendMessageToHub("RemoveToDoItem", itemId);
                 return Promise.resolve();
             },
             key: nameof<ToDoItem>(x => x.id),
@@ -116,7 +110,7 @@ export default class Home extends React.Component<{}, IHomeState> {
                                         <SimpleItem dataField={nameof<ToDoItem>(x => x.name)} />
                                         <SimpleItem dataField={nameof<ToDoItem>(x => x.description)} />
                                     </Form>
-                                    <Texts 
+                                    <Texts
                                         confirmDeleteMessage="Sind Sie sicher, dass Sie diese Aufgabe löschen wollen?"
                                     />
                                 </Editing>
@@ -155,11 +149,6 @@ export default class Home extends React.Component<{}, IHomeState> {
                                     visible={false}
                                     sortOrder="desc"
                                     sortIndex={0}
-                                />
-                                 <Column
-                                    caption="Änderungsdatum"
-                                    dataField={nameof<ToDoItem>(x => x.modificationDate)}
-                                    visible={false}
                                 />
                                 <Column
                                     caption="Erledigungsdatum"
@@ -202,29 +191,19 @@ export default class Home extends React.Component<{}, IHomeState> {
         );
     }
 
-    onComplete = (id: string) => {
-        this.hubConnection.send("CompleteToDoItem", id).catch(_ => {
+    sendMessageToHub = (methodName: string, ...args: any[]) => {
+        this.hubConnection.send(methodName, ...args).catch(_ => {
             this.notificateNoConnectionToHub();
         });
     }
 
-    onRevokeCompletion = (id: string) => {
-        this.hubConnection.send("RevokeCompletionToDoItem", id).catch(_ => {
-            this.notificateNoConnectionToHub();
-        });
-    }
+    onComplete = (id: string) => this.sendMessageToHub("CompleteToDoItem", id);
 
-    onSchedule = (id: string, date: Date) => {
-        this.hubConnection.send("ScheduleToDoItem", id, date).catch(_ => {
-            this.notificateNoConnectionToHub();
-        });
-    }
+    onRevokeCompletion = (id: string) => this.sendMessageToHub("RevokeCompletionToDoItem", id);
 
-    onClearScheduling = (id: string) => {
-        this.hubConnection.send("ClearSchedulingToDoItem", id).catch(_ => {
-            this.notificateNoConnectionToHub();
-        });
-    }
+    onSchedule = (id: string, date: Date) => this.sendMessageToHub("ScheduleToDoItem", id, date);
+
+    onClearScheduling = (id: string) => this.sendMessageToHub("ClearSchedulingToDoItem", id);
 
     notificateNoConnectionToHub() {
         notification.error('Keine Verbindung zum Server.');

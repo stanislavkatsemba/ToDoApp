@@ -46,7 +46,7 @@ export const ToDoItemMain = ({ item, onComplete, onRevokeCompletion, onSchedule,
                     <div>
                         <div className="todoitem-date">
                             Erstellt {new Date(item.creationDate).toLocaleDateString()}
-                            {item.modificationDate ? <>, ge&auml;ndert {new Date(item.modificationDate).toLocaleDateString()} </> : ""}
+                            {item.isCompleted && item.completionData ? <>, erledigt {new Date(item.completionData).toLocaleDateString()} </> : ""}
                         </div>
                         <CheckBox
                             value={item.isCompleted}
@@ -55,7 +55,7 @@ export const ToDoItemMain = ({ item, onComplete, onRevokeCompletion, onSchedule,
                         <span
                             className={item.isCompleted ? "todoitem-name-completed todoitem-name" : "todoitem-name"}
                         >
-                            {item.isCompleted && item.completionData ? <> {new Date(item.completionData).toLocaleDateString()}&nbsp;</> : ""}{item.name}
+                            {item.name}
                         </span>
                         <div className="todoitem-description">
                             {item.description}
