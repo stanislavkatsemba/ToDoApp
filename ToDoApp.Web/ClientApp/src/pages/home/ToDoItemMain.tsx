@@ -8,8 +8,8 @@ interface ToDoItemMainProps {
     item: ToDoItem,
     onComplete: (id: string) => void,
     onRevokeCompletion: (id: string) => void,
-    onSchedule:(id: string, date: Date) => void,
-    onClearScheduling:(id:string) => void,
+    onSchedule: (id: string, date: Date) => void,
+    onClearScheduling: (id: string) => void,
 }
 
 export const ToDoItemMain = ({ item, onComplete, onRevokeCompletion, onSchedule, onClearScheduling }: ToDoItemMainProps) => {
@@ -44,16 +44,20 @@ export const ToDoItemMain = ({ item, onComplete, onRevokeCompletion, onSchedule,
                     ratio={1}
                 >
                     <div>
+                        <div className="todoitem-date">
+                            Erstellt {new Date(item.creationDate).toLocaleDateString()}
+                            {item.modificationDate ? <>, ge&auml;ndert {new Date(item.modificationDate).toLocaleDateString()} </> : ""}
+                        </div>
                         <CheckBox
                             value={item.isCompleted}
                             onValueChange={onCompleteClick}
                         />&nbsp;&nbsp;&nbsp;
                         <span
-                            className={item.isCompleted ? "item-name-completed" : ""}
+                            className={item.isCompleted ? "todoitem-name-completed todoitem-name" : "todoitem-name"}
                         >
                             {item.isCompleted && item.completionData ? <> {new Date(item.completionData).toLocaleDateString()}&nbsp;</> : ""}{item.name}
                         </span>
-                        <div className="item-description">
+                        <div className="todoitem-description">
                             {item.description}
                         </div>
                     </div>
@@ -63,7 +67,7 @@ export const ToDoItemMain = ({ item, onComplete, onRevokeCompletion, onSchedule,
                     baseSize={150}
                 >
                     <div>
-                        <div className="item-description">Planen</div>
+                        <div className="todoitem-scheduling-caption">Planen</div>
                         <DateBox
                             value={item.scheduledDate}
                             readOnly={item.isCompleted}
