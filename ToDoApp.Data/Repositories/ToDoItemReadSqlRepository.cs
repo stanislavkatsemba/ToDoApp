@@ -27,8 +27,7 @@ namespace ToDoApp.Data.Repositories
 
         public async Task<IEnumerable<ToDoItem>> GetAllForUser(UserId userId)
         {
-            var command = SelectCommand +
-                          $"{nameof(ToDoItemModel.UserId)} = {{0}}";
+            var command = SelectCommand + $@"{nameof(ToDoItemModel.UserId)} = {{0}}";
             var result = await _databaseContext.ToDoItemsRead.FromSqlRaw(command, userId.Value).ToListAsync();
             return result;
         }
@@ -43,7 +42,7 @@ namespace ToDoApp.Data.Repositories
                 {
                     return _selectCommand;
                 }
-                _selectCommand = $@"SELECT 
+                _selectCommand = $@"SELECT TOP 10000
     {nameof(ToDoItemModel.Id)}
     , {nameof(ToDoItemModel.Name)}
     , {nameof(ToDoItemModel.Description)}
