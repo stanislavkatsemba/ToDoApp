@@ -71,7 +71,7 @@ namespace ToDoApp.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ToDoAppContext dbContext)
         {
             if (env.IsDevelopment())
             {
@@ -81,6 +81,8 @@ namespace ToDoApp.Web
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            dbContext.Database.EnsureCreated();
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
