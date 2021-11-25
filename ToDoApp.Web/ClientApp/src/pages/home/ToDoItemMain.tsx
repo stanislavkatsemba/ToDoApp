@@ -74,6 +74,7 @@ export const ToDoItemMain = ({ item, onComplete, onRevokeCompletion, onSchedule,
                             min={new Date()}
                             showClearButton={true}
                             onValueChange={onSchedulingChange}
+                            dateSerializationFormat="yyyy-MM-dd"
                         />
                     </div>
                 </Item>
