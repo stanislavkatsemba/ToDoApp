@@ -26,19 +26,30 @@ namespace ToDoApp.Data.Repositories
             return snapshot != null ? ToDoItem.FromSnapshot(snapshot) : null;
         }
 
+        public async Task Remove(ToDoItemId id)
+        {
+            var dbItem = await FindByIdPrivate(id.Value.ToString());
+            _databaseContext.Remove(dbItem);
+            await _databaseContext.SaveChangesAsync();
+        }
+
         public async Task Update(ToDoItem toDoItem)
         {
             var snapshot = toDoItem.ToSnapshot();
-            var dbItem = await _databaseContext.ToDoItems.FindAsync(snapshot.Id);
-            if (dbItem != null)
+            var dbItem = await FindByIdPrivate(snapshot.Id);
+            _databaseContext.Entry(dbItem).CurrentValues.SetValues(snapshot);
+            _databaseContext.Update(dbItem);
+            await _databaseContext.SaveChangesAsync();
+        }
+
+        private async Task<ToDoItemModel> FindByIdPrivate(string id, bool throwExceptionIfNull = true)
+        {
+            var toDoItem = await _databaseContext.ToDoItems.FindAsync(id);
+            if (toDoItem == null && throwExceptionIfNull)
             {
-                _databaseContext.Entry(dbItem).CurrentValues.SetValues(snapshot);
-                await _databaseContext.SaveChangesAsync();
+                throw new EntityNotFoundException(nameof(ToDoItemId), id);
             }
-            else
-            {
-                throw new EntityNotFoundException(nameof(ToDoItemId), snapshot.Id);
-            }
+            return toDoItem;
         }
     }
 }

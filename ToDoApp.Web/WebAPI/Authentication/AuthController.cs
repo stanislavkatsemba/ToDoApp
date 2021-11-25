@@ -40,7 +40,7 @@ namespace ToDoApp.Web.WebAPI.Authentication
                 return Result.Failure("Falsches Benutzernamen oder Kennwort.");
             }
 
-            var jwt = _jwtService.GenerateToken(userName);
+            var jwt = _jwtService.GenerateToken(userName, result.Id.Value.ToString());
             Response.Cookies.Append("jwt", jwt, new CookieOptions { HttpOnly = true });
             
             return Result.Success();

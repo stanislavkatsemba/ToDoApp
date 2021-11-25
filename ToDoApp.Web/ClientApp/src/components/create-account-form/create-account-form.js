@@ -21,7 +21,7 @@ export default function CreateAccountForm(props) {
 
     const onSubmit = useCallback(async (e) => {
         e.preventDefault();
-        const { email, password } = formData.current;
+        const { email } = formData.current;
         setLoading(true);
 
         const result = await apiClient.register(email);

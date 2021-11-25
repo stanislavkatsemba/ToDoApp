@@ -32,3 +32,29 @@
     }
   }
 }
+
+.todoitem-description {
+    font-size: 13px;
+    margin-top: 4px;
+    color: gray;
+}
+
+.todoitem-scheduling-caption {
+    font-size: 13px;
+    color: gray;
+}
+
+.todoitem-date {
+    font-size: 10px;
+    color: lightgray;
+}
+
+.todoitem-name {
+    font-size: 15px;
+}
+
+.todoitem-name-completed {
+    text-decoration: line-through;
+    color: gray;
+}
+

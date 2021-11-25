@@ -1,12 +1,11 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Form, {
     Item,
     Label,
     ButtonItem,
     ButtonOptions,
     RequiredRule,
-    EmailRule
 } from 'devextreme-react/form';
 import LoadIndicator from 'devextreme-react/load-indicator';
 import notify from 'devextreme/ui/notify';
@@ -85,7 +84,7 @@ export default function LoginForm() {
                 {/*</Item>*/}
                 <ButtonItem>
                     <ButtonOptions
-                        text={'Create an account'}
+                        text={'Konto anlegen'}
                         width={'100%'}
                         onClick={onCreateAccountClick}
                     />

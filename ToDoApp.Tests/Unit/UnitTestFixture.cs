@@ -8,7 +8,7 @@ namespace ToDoApp.Tests.Unit
 
         public UnitTestFixture()
         {
-            ToDoItemService = new ToDoItemService(new ToDoItemInMemoryRepository());
+            ToDoItemService = new ToDoItemService(new ToDoItemInMemoryRepository(), new FakeEventPublisher());
         }
     }
 }

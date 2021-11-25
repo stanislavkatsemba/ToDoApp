@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using ToDoApp.Domain.Shared;
 using ToDoApp.Domain.Users;
 
@@ -8,7 +9,7 @@ namespace ToDoApp.Domain.ToDoItems
     {
         public ToDoItemId Id { get; }
 
-        private readonly UserId _userId;
+        public UserId UserId { get; }
 
         private string _name;
 
@@ -22,16 +23,21 @@ namespace ToDoApp.Domain.ToDoItems
 
         public bool IsCompleted => _isCompleted;
 
-        public bool IsOwnedBy(UserId userId) => _userId.Equals(userId);
+        public bool IsOwnedBy(UserId userId) => UserId.Equals(userId);
 
-        public static ToDoItem New(UserId userId, string name, string description, DateTime? scheduledDate = null) =>
-            new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate, isCompleted: false, completionData: null);
+        public static ToDoItem New(UserId userId, string name, string description) =>
+            new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate: null, isCompleted: false, completionData: null);
 
         private ToDoItem(ToDoItemId id, UserId userId, string name, string description, DateTime? scheduledDate,
             bool isCompleted, DateTime? completionData)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
             Id = id;
-            _userId = userId;
+            UserId = userId;
             _name = name;
             _description = description;
             _scheduledDate = scheduledDate;
@@ -46,7 +52,7 @@ namespace ToDoApp.Domain.ToDoItems
                 return Result.Failure("Der Aufgabenname darf nicht leer sein.");
             }
 
-            if (_name.Equals(name) && _description.Equals(description))
+            if (_name == name && _description == description)
             {
                 return Result.Success();
             }
@@ -112,7 +118,7 @@ namespace ToDoApp.Domain.ToDoItems
         public ToDoItemSnapshot ToSnapshot()
         {
             return new ToDoItemSnapshot(Id.Value.ToString(),
-                   _userId.Value.ToString(),
+                   UserId.Value.ToString(),
                    _name,
                    _description,
                    _scheduledDate,

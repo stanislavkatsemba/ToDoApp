@@ -9,7 +9,7 @@ export default function UserPanel({ menuMode }) {
 
     const menuItems = useMemo(() => ([
         {
-            text: 'Logout',
+            text: 'Abmelden',
             icon: 'runner',
             onClick: signOut
         }
