@@ -9,7 +9,7 @@ namespace ToDoApp.Domain.ToDoItems
     {
         public ToDoItemId Id { get; }
 
-        private readonly UserId _userId;
+        public UserId UserId { get; }
 
         private string _name;
 
@@ -23,7 +23,7 @@ namespace ToDoApp.Domain.ToDoItems
 
         public bool IsCompleted => _isCompleted;
 
-        public bool IsOwnedBy(UserId userId) => _userId.Equals(userId);
+        public bool IsOwnedBy(UserId userId) => UserId.Equals(userId);
 
         public static ToDoItem New(UserId userId, string name, string description) =>
             new ToDoItem(ToDoItemId.New(), userId, name, description, scheduledDate: null, isCompleted: false, completionData: null);
@@ -37,7 +37,7 @@ namespace ToDoApp.Domain.ToDoItems
             }
 
             Id = id;
-            _userId = userId;
+            UserId = userId;
             _name = name;
             _description = description;
             _scheduledDate = scheduledDate;
@@ -118,7 +118,7 @@ namespace ToDoApp.Domain.ToDoItems
         public ToDoItemSnapshot ToSnapshot()
         {
             return new ToDoItemSnapshot(Id.Value.ToString(),
-                   _userId.Value.ToString(),
+                   UserId.Value.ToString(),
                    _name,
                    _description,
                    _scheduledDate,

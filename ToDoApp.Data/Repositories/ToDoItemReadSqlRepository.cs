@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using ToDoApp.Data.Models;
+using ToDoApp.Domain.ToDoItems;
 using ToDoApp.Domain.ToDoItems.ReadModel;
 using ToDoApp.Domain.Users;
+using ToDoItem = ToDoApp.Domain.ToDoItems.ReadModel.ToDoItem;
 
 namespace ToDoApp.Data.Repositories
 {
@@ -17,11 +18,11 @@ namespace ToDoApp.Data.Repositories
             _databaseContext = databaseContext;
         }
 
-        public async Task<ToDoItem> GetById(UserId userId, Guid todItemId)
+        public async Task<ToDoItem> GetById(UserId userId, ToDoItemId todItemId)
         {
             var command = SelectCommand +
                 $"{nameof(ToDoItemModel.Id)} = {{0}} AND {nameof(ToDoItemModel.UserId)} = {{1}}";
-            var result = await _databaseContext.ToDoItemsRead.FromSqlRaw(command, todItemId, userId.Value).FirstOrDefaultAsync();
+            var result = await _databaseContext.ToDoItemsRead.FromSqlRaw(command, todItemId.Value, userId.Value).FirstOrDefaultAsync();
             return result;
         }
 

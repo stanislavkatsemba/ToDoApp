@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ToDoApp.Data;
 using ToDoApp.Data.Repositories;
+using ToDoApp.Domain.Shared.Common.Events;
 using ToDoApp.Domain.ToDoItems;
 using ToDoApp.Domain.ToDoItems.ReadModel;
 using ToDoApp.Domain.Users;
@@ -57,6 +60,11 @@ namespace ToDoApp.Web
             services.AddScoped<UserService>();
             services.AddScoped<ToDoItemService>();
 
+            //Domain events
+            services.AddSingleton<IDomainEventPublisher, InMemoryEventPublisher>();
+            services.AddScoped<IDomainEventHandler<ToDoItemChanged>, ToDoItemEventHandler>();
+            services.AddScoped<IDomainEventHandler<ToDoItemRemoved>, ToDoItemEventHandler>();
+
             //SignalR
             services.AddSignalR();
         }
@@ -102,6 +110,26 @@ namespace ToDoApp.Web
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+        }
+
+        private class InMemoryEventPublisher : IDomainEventPublisher
+        {
+            private readonly IServiceProvider _serviceProvider;
+
+            public InMemoryEventPublisher(IServiceProvider serviceProvider)
+            {
+                _serviceProvider = serviceProvider;
+            }
+
+            public async Task Publish<T>(T domainEvent) where T : IDomainEvent
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var handlers = scope.ServiceProvider.GetServices<IDomainEventHandler<T>>();
+                foreach (var handler in handlers)
+                {
+                    await handler.Handle(domainEvent);
+                }
+            }
         }
     }
 }

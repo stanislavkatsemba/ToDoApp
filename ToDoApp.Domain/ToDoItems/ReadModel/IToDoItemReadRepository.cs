@@ -7,7 +7,7 @@ namespace ToDoApp.Domain.ToDoItems.ReadModel
 {
     public interface IToDoItemReadRepository
     {
-        Task<ToDoItem> GetById(UserId userId, Guid id);
+        Task<ToDoItem> GetById(UserId userId, ToDoItemId id);
 
         Task<IEnumerable<ToDoItem>> GetAllForUser(UserId userId);
     }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ToDoApp.Domain.Shared;
+using ToDoApp.Domain.Shared.Common;
+using ToDoApp.Domain.Shared.Common.Events;
 using ToDoApp.Domain.Users;
 
 namespace ToDoApp.Domain.ToDoItems
@@ -8,13 +10,18 @@ namespace ToDoApp.Domain.ToDoItems
     public class ToDoItemService
     {
         private readonly IToDoItemRepository _repository;
+        private readonly IDomainEventPublisher _domainEventPublisher;
 
-        public ToDoItemService(IToDoItemRepository repository) =>
+        public ToDoItemService(IToDoItemRepository repository, IDomainEventPublisher domainEventPublisher)
+        {
             _repository = repository;
+            _domainEventPublisher = domainEventPublisher;
+        }
 
         public async Task<Result> Create(ToDoItem toDoItem)
         {
             await _repository.CreateNew(toDoItem);
+            _ = _domainEventPublisher.Publish(new ToDoItemChanged(toDoItem.UserId, toDoItem.Id));
             return Result.Success();
         }
 
@@ -27,6 +34,7 @@ namespace ToDoApp.Domain.ToDoItems
                 return checkResult;
             }
             await _repository.Remove(toDoItem.Id);
+            _ = _domainEventPublisher.Publish(new ToDoItemRemoved(toDoItem.UserId, toDoItem.Id));
             return Result.Success();
         }
 
@@ -68,6 +76,7 @@ namespace ToDoApp.Domain.ToDoItems
             if (result.IsSuccessful)
             {
                 await _repository.Update(toDoItem);
+                _ = _domainEventPublisher.Publish(new ToDoItemChanged(userId, toDoItemId));
             }
 
             return result;

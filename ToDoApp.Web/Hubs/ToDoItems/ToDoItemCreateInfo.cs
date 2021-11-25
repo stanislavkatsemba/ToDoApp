@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ToDoApp.Web.Hubs.ToDoItems
+﻿namespace ToDoApp.Web.Hubs.ToDoItems
 {
     public class ToDoItemDto
     {

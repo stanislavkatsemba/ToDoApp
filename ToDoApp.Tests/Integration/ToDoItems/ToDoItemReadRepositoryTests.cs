@@ -45,7 +45,7 @@ namespace ToDoApp.Tests.Integration.ToDoItems
             // and:
             await _toDoItemRepository.Update(toDoItem);
             // and:
-            var toDoItemFromDb = await _toDoItemReadRepository.GetById(user.Id, toDoItem.Id.Value);
+            var toDoItemFromDb = await _toDoItemReadRepository.GetById(user.Id, toDoItem.Id);
             // expect:
             toDoItemFromDb.Should().NotBeNull();
             // and:
