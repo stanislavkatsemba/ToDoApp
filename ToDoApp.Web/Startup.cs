@@ -12,6 +12,7 @@ using ToDoApp.Data;
 using ToDoApp.Data.Repositories;
 using ToDoApp.Domain.Shared.Common.Events;
 using ToDoApp.Domain.ToDoItems;
+using ToDoApp.Domain.ToDoItems.Events;
 using ToDoApp.Domain.ToDoItems.ReadModel;
 using ToDoApp.Domain.Users;
 using ToDoApp.Web.Common.Authentication;
@@ -62,8 +63,8 @@ namespace ToDoApp.Web
 
             //Domain events
             services.AddSingleton<IDomainEventPublisher, InMemoryEventPublisher>();
-            services.AddScoped<IDomainEventHandler<ToDoItemChanged>, ToDoItemEventHandler>();
-            services.AddScoped<IDomainEventHandler<ToDoItemRemoved>, ToDoItemEventHandler>();
+            services.AddScoped<IDomainEventHandler<ToDoItemChangedEvent>, ToDoItemEventHandler>();
+            services.AddScoped<IDomainEventHandler<ToDoItemRemovedEvent>, ToDoItemEventHandler>();
 
             //SignalR
             services.AddSignalR();

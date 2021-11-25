@@ -2,17 +2,17 @@
 using ToDoApp.Domain.Shared.Common.Events;
 using ToDoApp.Domain.Users;
 
-namespace ToDoApp.Domain.ToDoItems
+namespace ToDoApp.Domain.ToDoItems.Events
 {
-    public class ToDoItemChanged : IDomainEvent
+    public abstract class BaseToDoItemEvent : IDomainEvent
     {
         public Guid EventId { get; }
 
         public ToDoItemId ToDoItemId { get; }
-        
+
         public UserId UserId { get; }
 
-        public ToDoItemChanged(UserId userId, ToDoItemId toDoItemId)
+        protected BaseToDoItemEvent(UserId userId, ToDoItemId toDoItemId)
         {
             EventId = Guid.NewGuid();
             ToDoItemId = toDoItemId;
